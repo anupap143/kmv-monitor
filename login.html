@@ -1,0 +1,1054 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>KMV Network Monitor | Secure Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background:
+                linear-gradient(rgba(15, 23, 42, 0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(15, 23, 42, 0.04) 1px, transparent 1px),
+                #eef5f9;
+            background-size: 36px 36px;
+            color: #172033;
+            font-family: 'Segoe UI', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 36px;
+            overflow-x: hidden;
+        }
+
+        body::before,
+        body::after {
+            content: '';
+            position: fixed;
+            pointer-events: none;
+            opacity: 0.34;
+        }
+
+        body::before {
+            inset: 0;
+            background: linear-gradient(135deg, rgba(56, 189, 248, 0.12), transparent 42%, rgba(245, 158, 11, 0.1));
+        }
+
+        body::after {
+            display: none;
+        }
+        
+        .login-container {
+            display: flex;
+            width: 100%;
+            max-width: 1120px;
+            min-height: 640px;
+            background: #ffffff;
+            border: 1px solid #dbe7f0;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 24px 70px rgba(15, 23, 42, 0.18);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .login-left {
+            width: 390px;
+            flex: 0 0 390px;
+            padding: 38px 38px 30px;
+            display: flex;
+            flex-direction: column;
+            background: #ffffff;
+            border-right: 1px solid #e5eef8;
+        }
+        
+        .logo-section {
+            text-align: left;
+            margin-bottom: 28px;
+        }
+        
+        .company-login-logo {
+            width: 96px;
+            height: 72px;
+            margin: 0 0 18px;
+            background: #ffffff;
+            border: 1px solid #dbe7f0;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: none;
+            overflow: hidden;
+            padding: 8px;
+        }
+
+        .company-login-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .company-login-logo .logo-fallback {
+            color: #1d4ed8;
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: 0;
+        }
+        
+        .company-name {
+            font-size: 18px;
+            line-height: 1.25;
+            font-weight: 800;
+            color: #0f172a;
+            margin-bottom: 8px;
+            letter-spacing: 0;
+            text-shadow: none;
+        }
+        
+        .company-tagline {
+            font-size: 13px;
+            color: #64748b;
+            margin-bottom: 0;
+        }
+
+        .login-shell-title {
+            margin-bottom: 22px;
+        }
+        
+        .features-list {
+            display: none;
+        }
+        
+        .login-right {
+            flex: 1;
+            padding: 0;
+            display: flex;
+            align-items: stretch;
+            justify-content: stretch;
+            background:
+                linear-gradient(145deg, rgba(17, 24, 39, 0.82), rgba(15, 23, 42, 0.72)),
+                url('/static/network-monitor-plain.svg') center / cover no-repeat,
+                #111827;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-right::before {
+            content: '';
+            position: absolute;
+            inset: 28px;
+            border: 1px solid rgba(56, 189, 248, 0.24);
+            border-radius: 8px;
+            background: rgba(15, 23, 42, 0.22);
+        }
+
+        .login-right::after {
+            content: 'KMV NETWORK MONITOR';
+            position: absolute;
+            right: 34px;
+            bottom: 28px;
+            color: rgba(200, 216, 232, 0.48);
+            font-size: 12px;
+            font-weight: 700;
+        }
+        
+        .login-form {
+            width: 100%;
+            margin: 0;
+            flex: 1;
+        }
+
+        .login-section {
+            display: none;
+        }
+
+        .login-section.active {
+            display: block;
+        }
+        
+        .form-title {
+            font-size: 22px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            color: #1f2937;
+            letter-spacing: 0;
+            text-align: left;
+        }
+        
+        .form-subtitle {
+            font-size: 13px;
+            color: #64748b;
+            margin-bottom: 22px;
+            text-align: left;
+        }
+        
+        .form-group {
+            margin-bottom: 14px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #334155;
+            letter-spacing: 0;
+        }
+
+        .input-wrap {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 13px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            font-size: 13px;
+            pointer-events: none;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 14px 12px 38px;
+            background: #ffffff;
+            border: 1px solid #dbe7f0;
+            border-radius: 6px;
+            color: #111827;
+            font-size: 13px;
+            transition: all 0.3s ease;
+            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: #2d9df4;
+            box-shadow: 0 0 0 3px rgba(45, 157, 244, 0.12);
+            background: #ffffff;
+        }
+        
+        .form-control::placeholder {
+            color: #94a3b8;
+        }
+        
+        .password-toggle {
+            position: relative;
+        }
+        
+        .password-toggle .toggle-btn {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #64748b;
+            cursor: pointer;
+            padding: 5px;
+        }
+        
+        .password-toggle .toggle-btn:hover {
+            color: #2d9df4;
+        }
+        
+        .btn-login {
+            width: 100%;
+            min-width: 120px;
+            padding: 12px 16px;
+            background: #0284c7;
+            color: #ffffff;
+            border: none;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            text-transform: none;
+            letter-spacing: 0;
+            transition: all 0.3s ease;
+            margin-top: 4px;
+        }
+        
+        .btn-login:hover {
+            transform: translateY(-2px);
+            background: #0369a1;
+            box-shadow: 0 10px 25px rgba(14, 116, 144, 0.22);
+        }
+        
+        .btn-login:active {
+            transform: translateY(0);
+        }
+        
+        .btn-login:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .form-links {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 14px;
+            font-size: 12px;
+        }
+        
+        .form-links a {
+            color: #94a3b8;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .form-links a:hover {
+            color: #2d9df4;
+        }
+        
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #475569;
+            font-size: 12px;
+            user-select: none;
+        }
+        
+        .form-checkbox {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            accent-color: #2d9df4;
+        }
+        
+        .alert {
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            border: 1px solid;
+        }
+        
+        .alert-danger {
+            background: #fff1f2;
+            border-color: #fecdd3;
+            color: #be123c;
+        }
+        
+        .alert-warning {
+            background: #fffbeb;
+            border-color: #fde68a;
+            color: #92400e;
+        }
+        
+        .alert-success {
+            background: #ecfeff;
+            border-color: #a5f3fc;
+            color: #0e7490;
+        }
+
+        .field-note {
+            min-height: 18px;
+            margin-top: 7px;
+            font-size: 11px;
+            color: #64748b;
+        }
+
+        .field-note.warning {
+            color: #b45309;
+        }
+
+        .login-meta {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+            margin: 20px 0 0;
+        }
+
+        .meta-item {
+            border: 1px solid #e5eef8;
+            border-radius: 8px;
+            padding: 10px;
+            background: #f8fafc;
+        }
+
+        .meta-label {
+            color: #64748b;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .meta-value {
+            margin-top: 3px;
+            color: #0f172a;
+            font-size: 12px;
+            font-weight: 800;
+        }
+        
+        .loading-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(45, 157, 244, 0.3);
+            border-top: 2px solid #2d9df4;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-right: 8px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .version-info {
+            position: absolute;
+            bottom: 15px;
+            right: 20px;
+            font-size: 11px;
+            color: #64748b;
+        }
+        
+        .forgot-password-section {
+            display: none;
+        }
+        
+        .forgot-password-section.active {
+            display: block;
+        }
+
+        .forgot-password-section .btn-login {
+            width: 100%;
+            border-radius: 4px;
+        }
+
+        .forgot-password-section .form-links {
+            justify-content: flex-start;
+            margin-top: 14px;
+        }
+        
+        .btn-back {
+            background: none;
+            border: 1px solid #cbd5e1;
+            color: #2d9df4;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-back:hover {
+            border-color: #2d9df4;
+            color: #1d4ed8;
+        }
+
+        .login-actions {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 14px;
+            margin-top: 10px;
+        }
+
+        .portal-panel {
+            position: relative;
+            z-index: 2;
+            width: min(520px, 84%);
+            margin: auto;
+            color: #dbeafe;
+        }
+
+        .portal-kicker {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 10px;
+            border: 1px solid rgba(56, 189, 248, 0.32);
+            border-radius: 999px;
+            color: #bae6fd;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .portal-logo {
+            width: 112px;
+            height: 88px;
+            margin: 0 0 18px;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.96);
+            border: 1px solid rgba(125, 211, 252, 0.32);
+            border-radius: 8px;
+            box-shadow: 0 18px 38px rgba(0, 0, 0, 0.22);
+            overflow: hidden;
+        }
+
+        .portal-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .portal-logo .logo-fallback {
+            color: #1d4ed8;
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: 0;
+        }
+
+        .portal-panel h1 {
+            margin: 18px 0 12px;
+            max-width: 460px;
+            color: #ffffff;
+            font-size: 34px;
+            line-height: 1.12;
+            font-weight: 800;
+        }
+
+        .portal-panel p {
+            max-width: 460px;
+            color: #b6c7da;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .portal-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+            margin-top: 28px;
+        }
+
+        .portal-card {
+            min-height: 92px;
+            padding: 14px;
+            border: 1px solid rgba(148, 163, 184, 0.22);
+            border-radius: 8px;
+            background: rgba(15, 23, 42, 0.52);
+        }
+
+        .portal-card i {
+            color: #38bdf8;
+            margin-bottom: 12px;
+        }
+
+        .portal-card strong {
+            display: block;
+            color: #f8fafc;
+            font-size: 13px;
+        }
+
+        .portal-card span {
+            display: block;
+            margin-top: 4px;
+            color: #94a3b8;
+            font-size: 12px;
+        }
+
+        .illustration-wrap {
+            display: none;
+        }
+
+        .city-illustration {
+            position: relative;
+            width: min(560px, 88%);
+            height: 390px;
+        }
+
+        .platform {
+            position: absolute;
+            left: 8%;
+            right: 3%;
+            bottom: 42px;
+            height: 84px;
+            background: linear-gradient(135deg, #38bdf8, #f59e0b);
+            border-radius: 8px;
+            box-shadow: 0 28px 45px rgba(0, 0, 0, 0.28);
+        }
+
+        .building {
+            position: absolute;
+            bottom: 98px;
+            background: linear-gradient(160deg, #1f3a5f 0%, #38bdf8 100%);
+            box-shadow: 0 22px 40px rgba(0, 0, 0, 0.18);
+        }
+
+        .building.one { left: 11%; width: 112px; height: 190px; border-radius: 8px 8px 0 0; }
+        .building.two { left: 31%; width: 130px; height: 255px; border-radius: 10px 10px 0 0; }
+        .building.three { right: 18%; width: 148px; height: 230px; border-radius: 74px 74px 18px 18px; }
+
+        .building::before {
+            content: '';
+            position: absolute;
+            inset: 18px;
+            background-image: linear-gradient(rgba(255,255,255,.34) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.28) 1px, transparent 1px);
+            background-size: 28px 28px;
+            opacity: .55;
+        }
+
+        .monitor-card {
+            position: absolute;
+            left: 42%;
+            top: 130px;
+            width: 138px;
+            height: 82px;
+            background: #0b1020;
+            border: 8px solid #38bdf8;
+            border-radius: 8px;
+            box-shadow: 0 18px 28px rgba(14, 116, 144, 0.18);
+        }
+
+        .monitor-card::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            bottom: -30px;
+            width: 44px;
+            height: 22px;
+            transform: translateX(-50%);
+            background: #38bdf8;
+            border-radius: 0 0 8px 8px;
+        }
+
+        .leaf {
+            position: absolute;
+            width: 76px;
+            height: 34px;
+            background: linear-gradient(135deg, #fbbf24, #38bdf8);
+            border-radius: 70% 8px 70% 8px;
+            transform: rotate(-24deg);
+        }
+
+        .leaf.left { left: 2%; bottom: 54px; }
+        .leaf.right { right: 2%; bottom: 76px; transform: rotate(28deg); }
+
+        .cube {
+            position: absolute;
+            width: 72px;
+            height: 72px;
+            background: rgba(56, 189, 248, 0.16);
+            transform: rotate(45deg);
+            border-radius: 8px;
+        }
+
+        .cube.a { left: 8%; top: 52px; }
+        .cube.b { right: 8%; top: 36px; opacity: .65; }
+        
+        @media (max-width: 768px) {
+            body {
+                align-items: flex-start;
+                padding: 18px;
+                overflow-y: auto;
+            }
+
+            .login-container {
+                flex-direction: column;
+                min-height: auto;
+            }
+            
+            .login-left {
+                width: 100%;
+                flex-basis: auto;
+                border-right: none;
+                border-bottom: 1px solid rgba(148, 163, 184, 0.28);
+                padding: 28px 24px;
+            }
+            
+            .login-right {
+                min-height: 360px;
+            }
+            
+            .company-login-logo {
+                width: 96px;
+                height: 72px;
+            }
+            
+            .company-name {
+                font-size: 20px;
+            }
+            
+            .features-list {
+                display: none;
+            }
+
+            .illustration-wrap {
+                padding: 18px;
+            }
+
+            .city-illustration {
+                height: 280px;
+            }
+
+            .portal-panel {
+                width: calc(100% - 36px);
+            }
+
+            .portal-panel h1 {
+                font-size: 26px;
+            }
+
+            .portal-grid,
+            .login-meta {
+                grid-template-columns: 1fr;
+            }
+
+            .version-info {
+                position: static;
+                margin: 14px 0 0;
+                text-align: center;
+                color: #64748b;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="login-container">
+    <!-- Left Section -->
+    <div class="login-left">
+        <div class="logo-section">
+            <div class="company-login-logo" id="loginCompanyLogo">
+                <span class="logo-fallback">KMV</span>
+            </div>
+            <div class="company-name">KMV NETWORK MONITOR</div>
+            <div class="company-tagline">Secure Network Access</div>
+        </div>
+
+        <div class="login-form">
+            <!-- Login Form -->
+            <div id="login-section" class="login-section active">
+                <div class="login-shell-title">
+                    <h3 class="form-title">Portal Login</h3>
+                    <p class="form-subtitle">Enter your credentials to continue</p>
+                </div>
+                
+                <div id="login-alerts"></div>
+                
+                <form onsubmit="handleLogin(event)">
+                    <div class="form-group">
+                        <label class="form-label" for="username">Username</label>
+                        <div class="input-wrap">
+                            <i class="fas fa-user input-icon"></i>
+                            <input type="text" id="username" class="form-control" placeholder="Username" autocomplete="username" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="password">Password</label>
+                        <div class="password-toggle">
+                            <i class="fas fa-lock input-icon"></i>
+                            <input type="password" id="password" class="form-control" placeholder="Password" autocomplete="current-password" required>
+                            <button type="button" class="toggle-btn" onclick="togglePassword(event)" aria-label="Show password">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <div class="field-note" id="capsLockNote"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="remember-me">
+                            <input type="checkbox" id="remember" class="form-checkbox">
+                            <span>Remember username on this device</span>
+                        </label>
+                    </div>
+                    
+                    <div class="login-actions">
+                        <button type="submit" class="btn-login" id="login-btn">
+                            <span id="btn-text">Login</span>
+                        </button>
+                    </div>
+                </form>
+                
+                <div class="form-links">
+                    <a href="#" onclick="showForgotPassword(event)">Forgot password?</a>
+                </div>
+
+                <div class="login-meta">
+                    <div class="meta-item">
+                        <div class="meta-label">Session</div>
+                        <div class="meta-value">30 min timeout</div>
+                    </div>
+                    <div class="meta-item">
+                        <div class="meta-label">Access</div>
+                        <div class="meta-value">Role based</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Forgot Password Form -->
+            <div id="forgot-section" class="forgot-password-section">
+                <h3 class="form-title">Password Reset</h3>
+                <p class="form-subtitle">Enter your email address to receive a reset link</p>
+                
+                <div id="forgot-alerts"></div>
+                
+                <form onsubmit="handleForgotPassword(event)">
+                    <div class="form-group">
+                        <label class="form-label" for="email">Email Address</label>
+                        <div class="input-wrap">
+                            <i class="fas fa-envelope input-icon"></i>
+                            <input type="email" id="email" class="form-control" placeholder="your.email@kmv.com" autocomplete="email" required>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn-login" id="forgot-btn">
+                        <span id="forgot-btn-text">Send Reset Link</span>
+                    </button>
+                </form>
+                
+                <div class="form-links">
+                    <button class="btn-back" onclick="backToLogin()">Back to Login</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Section -->
+    <div class="login-right">
+        <div class="portal-panel">
+            <div class="portal-logo" id="portalCompanyLogo">
+                <span class="logo-fallback">KMV</span>
+            </div>
+            <div class="portal-kicker"><i class="fas fa-shield-alt"></i> Secure NOC Access</div>
+            <h1>KMV Network Monitor</h1>
+            <p>Central access for site uptime, ISP status, engineers, reports, user administration, and audit visibility.</p>
+            <div class="portal-grid">
+                <div class="portal-card">
+                    <i class="fas fa-network-wired"></i>
+                    <strong>Site Monitoring</strong>
+                    <span>Live site health and latency checks</span>
+                </div>
+                <div class="portal-card">
+                    <i class="fas fa-user-shield"></i>
+                    <strong>User Control</strong>
+                    <span>Admin, engineer, and viewer roles</span>
+                </div>
+                <div class="portal-card">
+                    <i class="fas fa-file-alt"></i>
+                    <strong>Reports</strong>
+                    <span>CSV and JSON incident exports</span>
+                </div>
+                <div class="portal-card">
+                    <i class="fas fa-history"></i>
+                    <strong>Audit Logs</strong>
+                    <span>Tracked portal activity</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="version-info">
+    KMV Network Monitor v2.0 | 2024
+</div>
+
+<script>
+    async function loadLoginCompanyLogo() {
+        const logoBoxes = [
+            document.getElementById('loginCompanyLogo'),
+            document.getElementById('portalCompanyLogo')
+        ].filter(Boolean);
+
+        const setLogos = (html) => {
+            logoBoxes.forEach(logoBox => {
+                logoBox.innerHTML = html;
+            });
+        };
+
+        try {
+            const res = await fetch('/api/company/info');
+            if (res.ok) {
+                const data = await res.json();
+                if (data.has_logo) {
+                    setLogos(`<img src="/api/company/logo?t=${Date.now()}" alt="KMV Group Logo">`);
+                    return;
+                }
+            }
+        } catch (e) {
+            // Fallback below handles static or missing logo gracefully.
+        }
+
+        const fallbackLogo = new Image();
+        fallbackLogo.onload = () => {
+            setLogos('<img src="logo.png" alt="KMV Group Logo">');
+        };
+        fallbackLogo.onerror = () => {
+            setLogos('<span class="logo-fallback">KMV</span>');
+        };
+        fallbackLogo.src = 'logo.png';
+    }
+
+    function togglePassword(e) {
+        const field = document.getElementById('password');
+        const btn = e.target.closest('.toggle-btn');
+        const icon = btn.querySelector('i');
+        
+        if (field.type === 'password') {
+            field.type = 'text';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+            btn.setAttribute('aria-label', 'Hide password');
+        } else {
+            field.type = 'password';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+            btn.setAttribute('aria-label', 'Show password');
+        }
+    }
+
+    function setAlert(container, type, icon, message) {
+        container.innerHTML = `<div class="alert alert-${type}"><i class="fas ${icon} me-2"></i>${message}</div>`;
+    }
+
+    function saveRememberedUsername(username) {
+        const remember = document.getElementById('remember').checked;
+        if (remember) {
+            localStorage.setItem('kmvRememberedUsername', username);
+        } else {
+            localStorage.removeItem('kmvRememberedUsername');
+        }
+    }
+
+    function loadRememberedUsername() {
+        const username = localStorage.getItem('kmvRememberedUsername');
+        if (!username) return;
+        document.getElementById('username').value = username;
+        document.getElementById('remember').checked = true;
+        document.getElementById('password').focus();
+    }
+
+    function handleCapsLock(e) {
+        const note = document.getElementById('capsLockNote');
+        if (!note) return;
+        const isCapsLock = e.getModifierState && e.getModifierState('CapsLock');
+        note.textContent = isCapsLock ? 'Caps Lock is on' : '';
+        note.classList.toggle('warning', isCapsLock);
+    }
+    
+    function showForgotPassword(e) {
+        e.preventDefault();
+        document.getElementById('login-section').classList.remove('active');
+        document.getElementById('forgot-section').classList.add('active');
+        document.getElementById('email').focus();
+    }
+    
+    function backToLogin() {
+        document.getElementById('forgot-section').classList.remove('active');
+        document.getElementById('login-section').classList.add('active');
+        document.getElementById('login-alerts').innerHTML = '';
+    }
+    
+    async function handleLogin(e) {
+        e.preventDefault();
+        const loginBtn = document.getElementById('login-btn');
+        const btnText = document.getElementById('btn-text');
+        const alertsDiv = document.getElementById('login-alerts');
+        
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        
+        loginBtn.disabled = true;
+        btnText.innerHTML = '<span class="loading-spinner"></span>Signing in...';
+        alertsDiv.innerHTML = '';
+        
+        try {
+            const res = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({username, password})
+            });
+            
+            const data = await res.json();
+            
+            if (res.ok) {
+                saveRememberedUsername(username);
+                setAlert(alertsDiv, 'success', 'fa-check-circle', 'Login successful. Redirecting...');
+                setTimeout(() => {
+                    if (data.requires_password_change) {
+                        window.location.href = '/change-password';
+                    } else {
+                        window.location.href = '/';
+                    }
+                }, 1000);
+            } else {
+                setAlert(alertsDiv, 'danger', 'fa-exclamation-circle', data.error || 'Login failed');
+            }
+        } catch (err) {
+            setAlert(alertsDiv, 'danger', 'fa-exclamation-circle', 'Network error. Please try again.');
+        } finally {
+            loginBtn.disabled = false;
+            btnText.innerHTML = 'Sign In';
+        }
+    }
+    
+    async function handleForgotPassword(e) {
+        e.preventDefault();
+        const forgotBtn = document.getElementById('forgot-btn');
+        const btnText = document.getElementById('forgot-btn-text');
+        const alertsDiv = document.getElementById('forgot-alerts');
+        
+        const email = document.getElementById('email').value;
+        
+        forgotBtn.disabled = true;
+        btnText.innerHTML = '<span class="loading-spinner"></span>Sending...';
+        alertsDiv.innerHTML = '';
+        
+        try {
+            const res = await fetch('/api/auth/forgot-password', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({email})
+            });
+            
+            const data = await res.json();
+            
+            if (res.ok) {
+                const fallbackLink = data.reset_url ? `<br><small>Email is not configured. Use this reset link:<br><a href="${data.reset_url}">${data.reset_url}</a></small>` : '';
+                alertsDiv.innerHTML = `
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle me-2"></i>
+                        <strong>${data.mail_sent ? 'Check your email!' : 'Reset link generated.'}</strong> ${data.message || ''}
+                        ${fallbackLink}
+                    </div>
+                `;
+                if (data.mail_sent) setTimeout(() => backToLogin(), 3000);
+            } else {
+                setAlert(alertsDiv, 'danger', 'fa-exclamation-circle', data.error || 'Error occurred');
+            }
+        } catch (err) {
+            setAlert(alertsDiv, 'danger', 'fa-exclamation-circle', 'Network error. Please try again.');
+        } finally {
+            forgotBtn.disabled = false;
+            btnText.innerHTML = 'Send Reset Link';
+        }
+    }
+    
+    // Focus username field on load
+    window.addEventListener('load', () => {
+        loadLoginCompanyLogo();
+        loadRememberedUsername();
+        if (!document.getElementById('username').value) {
+            document.getElementById('username').focus();
+        }
+        document.getElementById('password').addEventListener('keyup', handleCapsLock);
+        document.getElementById('password').addEventListener('keydown', handleCapsLock);
+    });
+    
+    // Enter key to submit
+    document.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            const loginSection = document.getElementById('login-section').classList.contains('active');
+            if (loginSection) {
+                document.querySelector('#login-section form').dispatchEvent(new Event('submit'));
+            }
+        }
+    });
+</script>
+
+</body>
+</html>
+

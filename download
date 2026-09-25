@@ -1,0 +1,12 @@
+.git
+.env
+_env
+data
+uploads
+*.json
+__pycache__
+*.pyc
+Jenkinsfile
+k8s-*.yaml
+docker-compose.yml
+README.md

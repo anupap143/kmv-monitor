@@ -1,0 +1,116 @@
+# KMV Network Monitor web app
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kmv-monitor-config
+  namespace: kmv-monitor
+data:
+  # The address you open in the browser (used in password-reset mails)
+  APP_BASE_URL: "http://localhost:8083"
+  # Dashboard refreshes every 10 s; the app's built-in 50/hour limit would block it
+  RATE_LIMIT_DEFAULT: "20000 per day;2000 per hour"
+  FLASK_USE_RELOADER: "false"
+  SMTP_HOST: "smtp.office365.com"
+  SMTP_PORT: "587"
+  SMTP_USE_TLS: "true"
+  SMTP_USE_SSL: "false"
+  SMTP_USER: ""
+  SMTP_FROM: ""
+  MAIL_ALERTS_ENABLED: "false"
+  MAIL_ALERT_RECIPIENTS: ""
+  MAIL_ALERT_ON_RECOVERY: "true"
+---
+# Stores users, sites, settings JSON (/app/data) and the uploaded logo (/app/uploads)
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: kmv-monitor-files
+  namespace: kmv-monitor
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kmv-monitor
+  namespace: kmv-monitor
+  labels:
+    app: kmv-monitor
+spec:
+  # Keep 1 replica: the app keeps state in memory and each copy would ping
+  # every link and send its own alert mails.
+  replicas: 1
+  strategy:
+    type: Recreate          # the volume can only be used by one pod at a time
+  selector:
+    matchLabels:
+      app: kmv-monitor
+  template:
+    metadata:
+      labels:
+        app: kmv-monitor
+    spec:
+      containers:
+        - name: kmv-monitor
+          image: IMAGE_PLACEHOLDER          # Jenkins replaces this, e.g. kmv-monitor:5
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 3000
+          envFrom:
+            - configMapRef:
+                name: kmv-monitor-config
+          env:
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef: { name: kmv-monitor-secrets, key: POSTGRES_PASSWORD }
+            - name: DATABASE_URL
+              value: "postgresql://kmv_admin:$(DB_PASSWORD)@kmv-db:5432/kmv_network_db"
+            - name: FLASK_SECRET_KEY
+              valueFrom:
+                secretKeyRef: { name: kmv-monitor-secrets, key: FLASK_SECRET_KEY }
+            - name: SMTP_PASSWORD
+              valueFrom:
+                secretKeyRef: { name: kmv-monitor-secrets, key: SMTP_PASSWORD, optional: true }
+          securityContext:
+            capabilities:
+              add: ["NET_RAW"]              # needed for ping (same as cap_add in docker-compose)
+          readinessProbe:
+            httpGet: { path: /healthz, port: http }
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet: { path: /healthz, port: http }
+            initialDelaySeconds: 20
+            periodSeconds: 20
+            timeoutSeconds: 5
+          resources:
+            requests: { cpu: 100m, memory: 128Mi }
+            limits:   { cpu: "1", memory: 384Mi }
+          volumeMounts:
+            - name: files
+              mountPath: /app/data
+              subPath: data
+            - name: files
+              mountPath: /app/uploads
+              subPath: uploads
+      volumes:
+        - name: files
+          persistentVolumeClaim:
+            claimName: kmv-monitor-files
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kmv-monitor
+  namespace: kmv-monitor
+spec:
+  selector:
+    app: kmv-monitor
+  ports:
+    - name: http
+      port: 80
+      targetPort: http

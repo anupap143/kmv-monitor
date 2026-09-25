@@ -1,0 +1,2635 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>KMV Network Monitor | Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background:
+                radial-gradient(circle at 18% 8%, rgba(56, 189, 248, 0.20), transparent 32%),
+                radial-gradient(circle at 92% 18%, rgba(20, 184, 166, 0.14), transparent 30%),
+                linear-gradient(145deg, #0f2433 0%, #132f43 46%, #18384a 100%);
+            background-attachment: fixed;
+            color: #d8e8f2;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        
+        .top-bar {
+            background: #172b3c;
+            border-bottom: 1px solid #315167;
+            padding: 12px 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .logo-brand {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .company-logo {
+            width: 45px;
+            height: 45px;
+            background: white;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(14, 116, 144, 0.16);
+            cursor: pointer;
+        }
+        
+        .company-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            padding: 3px;
+        }
+        
+        .company-logo i {
+            font-size: 28px;
+            color: #38bdf8;
+        }
+
+        .company-logo:hover {
+            box-shadow: 0 0 0 2px #38bdf8, 0 4px 12px rgba(56, 189, 248, 0.24);
+        }
+        
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #0ea5e9 0%, #14b8a6 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+            box-shadow: 0 5px 15px rgba(14, 165, 233, 0.2);
+        }
+        
+        .logo-text h4 {
+            margin: 0;
+            font-size: 16px;
+            color: #7dd3fc;
+            font-weight: bold;
+        }
+        
+        .logo-text small {
+            color: #93aebe;
+            font-size: 11px;
+            display: block;
+        }
+        
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #0ea5e9 0%, #14b8a6 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+        }
+        
+        .dropdown-toggle::after {
+            border: none;
+        }
+        
+        .dropdown-menu {
+            background: #1f3446;
+            border: 1px solid #315167;
+            border-radius: 8px;
+        }
+        
+        .dropdown-item {
+            color: #d8e8f2;
+            padding: 10px 15px;
+            font-size: 13px;
+        }
+        
+        .dropdown-item:hover {
+            background: #29465b;
+            color: #7dd3fc;
+        }
+        
+        .dropdown-item i {
+            width: 20px;
+            margin-right: 10px;
+        }
+
+        .hidden-file-input {
+            display: none;
+        }
+        
+        .container-main {
+            display: flex;
+            min-height: calc(100vh - 70px);
+            position: relative;
+        }
+
+        .container-main::before {
+            content: '';
+            position: fixed;
+            right: 28px;
+            bottom: 28px;
+            width: 340px;
+            height: 340px;
+            pointer-events: none;
+            border-radius: 50% 50% 0 50%;
+            background:
+                linear-gradient(135deg, transparent 0 32%, rgba(125, 211, 252, 0.12) 32% 33%, transparent 33% 47%, rgba(45, 212, 191, 0.10) 47% 48%, transparent 48%),
+                radial-gradient(circle at 50% 50%, transparent 0 40%, rgba(125, 211, 252, 0.12) 41% 42%, transparent 43% 56%, rgba(45, 212, 191, 0.10) 57% 58%, transparent 59%);
+            opacity: 0.42;
+            z-index: 0;
+        }
+        
+        .sidebar {
+            width: 260px;
+            background: #172b3c;
+            border-right: 1px solid #315167;
+            padding: 20px;
+            overflow-y: auto;
+            height: calc(100vh - 70px);
+            position: fixed;
+            left: 0;
+            top: 70px;
+        }
+        
+        .main-content {
+            margin-left: 260px;
+            padding: 28px;
+            flex: 1;
+            overflow-y: auto;
+            height: calc(100vh - 70px);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .nav-link {
+            color: #a9bdca;
+            padding: 11px 13px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            margin-bottom: 5px;
+            transition: all 0.3s ease;
+            font-size: 13px;
+        }
+        
+        .nav-link:hover, .nav-link.active {
+            background: #29465b;
+            color: #7dd3fc;
+        }
+        
+        .nav-link i {
+            width: 20px;
+            margin-right: 12px;
+        }
+        
+        .nav-section {
+            font-size: 0.7rem;
+            color: #7b8fa3;
+            text-transform: uppercase;
+            margin: 20px 0 10px 15px;
+            font-weight: bold;
+        }
+        
+        .content-section {
+            display: none;
+        }
+        
+        .content-section.active {
+            display: block;
+        }
+        
+        .page-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 22px;
+            border-bottom: 1px solid #315167;
+            padding-bottom: 15px;
+            gap: 16px;
+        }
+        
+        .page-title h2 {
+            font-size: 24px;
+            color: #7dd3fc;
+        }
+        
+        .badge-info {
+            background: #f59e0b;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+        }
+        
+        /* User Management Styles */
+        .table-dark {
+            --bs-table-bg: #203647;
+            --bs-table-color: #d8e8f2;
+            --bs-table-border-color: #315167;
+            --bs-table-striped-bg: #223b4f;
+            --bs-table-hover-bg: #29465b;
+            background: #203647;
+            color: #d8e8f2;
+        }
+
+        .table-dark code {
+            color: #7dd3fc;
+            background: #173247;
+            border-radius: 4px;
+            padding: 2px 6px;
+        }
+        
+        .table-dark th {
+            background: #29465b;
+            color: #7dd3fc;
+            border: none;
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+        
+        .table-dark td {
+            border-bottom: 1px solid #315167;
+            padding: 12px;
+            vertical-align: middle;
+        }
+        
+        .user-row {
+            transition: all 0.3s ease;
+        }
+        
+        .user-row:hover {
+            background: #29465b;
+        }
+        
+        .role-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .role-admin {
+            background: #ff1744;
+            color: white;
+        }
+        
+        .role-engineer {
+            background: #f59e0b;
+            color: white;
+        }
+        
+        .role-viewer {
+            background: #FF9800;
+            color: white;
+        }
+        
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+        
+        .status-active,
+        .status-online {
+            background: #16a34a22;
+            color: #4ade80;
+            border: 1px solid #22c55e66;
+        }
+
+        .status-inactive,
+        .status-offline {
+            background: #dc262622;
+            color: #f87171;
+            border: 1px solid #ef444466;
+        }
+
+        .status-checking {
+            background: #f59e0b22;
+            color: #fbbf24;
+            border: 1px solid #f59e0b66;
+        }
+        
+        .industrial-form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+        }
+
+        .industrial-form-grid .full-width {
+            grid-column: 1 / -1;
+        }
+
+        @media (max-width: 768px) {
+            .industrial-form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 11px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: bold;
+            flex: 1;
+            text-align: center;
+        }
+        
+        .btn-activate {
+            background: #0ea5e9;
+            color: #ffffff;
+        }
+        
+        .btn-activate:hover {
+            background: #0ea5e9;
+        }
+        
+        .btn-remove {
+            background: #ff1744;
+            color: white;
+        }
+        
+        .btn-remove:hover {
+            background: #d60031;
+        }
+        
+        .btn-edit {
+            background: #14b8a6;
+            color: white;
+        }
+        
+        .btn-edit:hover {
+            background: #d97706;
+        }
+        
+        .stats-box {
+            background: #203647;
+            border: 1px solid #315167;
+            border-left: 4px solid #38bdf8;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 14px 30px rgba(0, 0, 0, 0.16);
+        }
+        
+        .stats-number {
+            font-size: 32px;
+            color: #7dd3fc;
+            font-weight: bold;
+        }
+        
+        .stats-label {
+            color: #a9bdca;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .dashboard-charts {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .chart-card {
+            background: #203647;
+            border: 1px solid #315167;
+            border-radius: 8px;
+            padding: 18px;
+            min-height: 320px;
+            box-shadow: 0 14px 30px rgba(0, 0, 0, 0.16);
+        }
+
+        .chart-card h5 {
+            color: #7dd3fc;
+            font-size: 14px;
+            margin-bottom: 16px;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 250px;
+        }
+
+        .chart-card-wide {
+            grid-column: span 2;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .action-buttons .btn-sm {
+            padding: 4px 8px;
+            font-size: 10px;
+            flex: 1;
+        }
+        
+        .btn-lock {
+            background: #FF9800;
+            color: white;
+        }
+        
+        .btn-lock:hover {
+            background: #f57c00;
+        }
+        
+        .btn-delete {
+            background: #ff1744;
+            color: white;
+        }
+        
+        .btn-delete:hover {
+            background: #d60031;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #9ca3af;
+        }
+        
+        .modal-dialog {
+            border-radius: 8px;
+        }
+        
+        .modal-content {
+            background: #203647;
+            border: 1px solid #315167;
+        }
+        
+        .modal-header {
+            border-bottom: 1px solid #315167;
+        }
+        
+        .modal-title {
+            color: #7dd3fc;
+        }
+        
+        .form-label {
+            color: #d8e8f2;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .form-control, .form-select {
+            background: #172b3c;
+            border: 1px solid #315167;
+            color: #d8e8f2;
+            font-size: 13px;
+            padding: 8px 12px;
+            border-radius: 4px;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            background: #172b3c;
+            border-color: #38bdf8;
+            color: #d8e8f2;
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.16);
+        }
+        
+        .form-control::placeholder {
+            color: #64748b;
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            user-select: none;
+        }
+
+        .form-checkbox {
+            width: 16px;
+            height: 16px;
+            accent-color: #0ea5e9;
+        }
+        
+        .btn-primary {
+            background: #0ea5e9;
+            border: none;
+            color: #ffffff;
+            font-weight: bold;
+            padding: 8px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-primary:hover {
+            background: #0284c7;
+        }
+
+        .refresh-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #14b8a6;
+            border: none;
+            color: #ffffff;
+            font-weight: bold;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .refresh-button:hover {
+            background: #0f9488;
+        }
+
+        .refresh-button.refreshing i {
+            animation: spin 0.8s linear infinite;
+        }
+
+        .title-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .auto-refresh-label {
+            color: #a9bdca;
+            font-size: 12px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .btn-secondary {
+            background: #29465b;
+            border: 1px solid #315167;
+            color: #d8e8f2;
+            font-weight: bold;
+            padding: 8px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-secondary:hover {
+            background: #315167;
+        }
+        
+        .modal-header .btn-close {
+            filter: invert(1);
+        }
+        
+        .success-message {
+            background: #38bdf818;
+            border-left: 4px solid #38bdf8;
+            color: #7dd3fc;
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .error-message {
+            background: #ff174412;
+            border-left: 4px solid #ff1744;
+            color: #ff1744;
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .app-toast {
+            position: fixed;
+            right: 24px;
+            top: 86px;
+            z-index: 1200;
+            min-width: 280px;
+            max-width: 420px;
+            padding: 12px 14px;
+            border-radius: 8px;
+            background: #203647;
+            border: 1px solid #315167;
+            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.24);
+            color: #d8e8f2;
+            display: none;
+        }
+
+        .app-toast.success {
+            border-left: 4px solid #38bdf8;
+        }
+
+        .app-toast.error {
+            border-left: 4px solid #ff1744;
+        }
+        
+        .add-site-button {
+            background: #0ea5e9;
+            color: #ffffff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+        
+        .add-site-button:hover {
+            background: #0284c7;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(14, 165, 233, 0.22);
+        }
+        
+        .modal-dialog-lg {
+            max-width: 600px;
+        }
+
+        @media (max-width: 920px) {
+            .dashboard-charts {
+                grid-template-columns: 1fr;
+            }
+
+            .chart-card-wide {
+                grid-column: span 1;
+            }
+
+            .top-bar {
+                padding: 10px 14px;
+            }
+
+            .container-main {
+                display: block;
+            }
+
+            .sidebar {
+                position: static;
+                width: 100%;
+                height: auto;
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 6px;
+            }
+
+            .nav-section {
+                grid-column: 1 / -1;
+            }
+
+            .main-content {
+                margin-left: 0;
+                height: auto;
+                padding: 18px;
+            }
+
+            .page-title {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- TOP BAR WITH LOGO -->
+    <div class="top-bar">
+        <div class="logo-brand">
+            <!-- COMPANY LOGO PLACEHOLDER -->
+            <div class="company-logo" id="companyLogo" onclick="selectCompanyLogo(event)" title="Upload company logo">
+                <i class="fas fa-building"></i>
+            </div>
+            <div class="logo-text">
+                <h4>KMV Network Monitor</h4>
+                <small>Network Operations Portal</small>
+            </div>
+        </div>
+        
+        <div class="user-menu">
+            <div class="user-info">
+                <div class="user-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div>
+                    <div style="font-size: 13px; font-weight: bold;" id="userName">User</div>
+                    <div style="font-size: 10px; color: #64748b;" id="userRole">role</div>
+                </div>
+            </div>
+            <div class="dropdown">
+                <a href="#" class="dropdown-toggle" role="button" data-bs-toggle="dropdown">
+                    <i class="fas fa-chevron-down"></i>
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="#" onclick="showProfile(event)"><i class="fas fa-user-circle"></i> Profile</a></li>
+                    <li><a class="dropdown-item" href="#" onclick="selectCompanyLogo(event)"><i class="fas fa-image"></i> Upload Company Logo</a></li>
+                    <li><a class="dropdown-item" href="#" onclick="showChangePassword(event)"><i class="fas fa-key"></i> Change Password</a></li>
+                    <li><hr class="dropdown-divider" style="border-color: #315167;"></li>
+                    <li><a class="dropdown-item" href="#" onclick="handleLogout(event)"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <input type="file" id="companyLogoInput" class="hidden-file-input" accept="image/png,image/jpeg,image/gif,image/webp" onchange="uploadCompanyLogo()">
+    <div id="app-toast" class="app-toast"></div>
+
+    <div class="container-main">
+        <!-- SIDEBAR NAVIGATION -->
+        <div class="sidebar">
+            <div class="nav-section">Monitoring</div>
+            <a class="nav-link active" onclick="switchSection('dashboard', event)">
+                <i class="fas fa-tachometer-alt"></i> Dashboard
+            </a>
+            <a class="nav-link" onclick="switchSection('all-sites', event)">
+                <i class="fas fa-globe"></i> All Sites
+            </a>
+            <a class="nav-link" onclick="switchSection('zones', event)">
+                <i class="fas fa-map-marked-alt"></i> Zones
+            </a>
+            <a class="nav-link" onclick="switchSection('engineers', event)">
+                <i class="fas fa-users-cog"></i> Engineers
+            </a>
+            
+            <div class="nav-section">Reports</div>
+            <a class="nav-link" onclick="switchSection('reports', event)">
+                <i class="fas fa-file-alt"></i> Reports
+            </a>
+            <a class="nav-link" onclick="switchSection('statistics', event)">
+                <i class="fas fa-chart-bar"></i> Statistics
+            </a>
+            
+            <div class="nav-section" data-rbac="admin">Administration</div>
+            <a class="nav-link" data-rbac="admin" onclick="switchSection('users', event)">
+                <i class="fas fa-user-shield"></i> User Management
+            </a>
+            <a class="nav-link" data-rbac="admin" onclick="switchSection('mail-settings', event)">
+                <i class="fas fa-envelope-open-text"></i> Mail Settings
+            </a>
+            <a class="nav-link" data-rbac="admin" onclick="switchSection('audit', event)">
+                <i class="fas fa-history"></i> Audit Logs
+            </a>
+        </div>
+
+        <!-- MAIN CONTENT AREA -->
+        <div class="main-content">
+            <!-- DASHBOARD SECTION -->
+            <div id="dashboard" class="content-section active">
+                <div class="page-title">
+                    <h2><i class="fas fa-tachometer-alt"></i> Dashboard</h2>
+                    <div class="title-actions">
+                        <span class="auto-refresh-label">Auto refresh: 10 sec</span>
+                        <button class="refresh-button" onclick="manualRefreshActiveSection()">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                    </div>
+                </div>
+                <div id="stats-grid" class="row" style="margin-bottom: 30px;">
+                    <div class="col-md-6 col-lg-3">
+                        <div class="stats-box">
+                            <div class="stats-number">--</div>
+                            <div class="stats-label">Total Sites</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="dashboard-charts">
+                    <div class="chart-card">
+                        <h5><i class="fas fa-circle-nodes"></i> Online vs Offline Sites</h5>
+                        <div class="chart-container"><canvas id="siteHealthChart"></canvas></div>
+                    </div>
+                    <div class="chart-card">
+                        <h5><i class="fas fa-map-marked-alt"></i> Zone Health</h5>
+                        <div class="chart-container"><canvas id="zoneHealthChart"></canvas></div>
+                    </div>
+                    <div class="chart-card chart-card-wide">
+                        <h5><i class="fas fa-clock"></i> Downtime Monitor - Last 7 Days</h5>
+                        <div class="chart-container"><canvas id="downtimeChart"></canvas></div>
+                    </div>
+                    <div class="chart-card chart-card-wide">
+                        <h5><i class="fas fa-triangle-exclamation"></i> Sites With Most Downtime - Last 7 Days</h5>
+                        <div class="chart-container"><canvas id="topDowntimeChart"></canvas></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ALL SITES SECTION -->
+            <div id="all-sites" class="content-section">
+                <div class="page-title">
+                    <h2><i class="fas fa-globe"></i> All Sites</h2>
+                    <div class="title-actions">
+                        <span class="auto-refresh-label">Auto refresh: 10 sec</span>
+                        <button class="refresh-button" onclick="manualRefreshActiveSection()">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                        <button class="btn btn-primary" data-rbac="admin" onclick="showMonitoringSiteModal()">
+                            <i class="fas fa-plus"></i> Add New Site
+                        </button>
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: minmax(240px, 1.4fr) minmax(160px, 1fr) minmax(160px, 1fr) minmax(160px, 1fr); gap: 12px; margin-bottom: 20px;">
+                    <input type="text" id="sites-search" class="form-control" placeholder="Search by site name, IP, or ISP...">
+                    <select id="sites-status-filter" class="form-select">
+                        <option value="">All Status</option>
+                        <option value="online">Online</option>
+                        <option value="offline">Offline</option>
+                    </select>
+                    <select id="sites-zone-filter" class="form-select">
+                        <option value="">All Zones</option>
+                    </select>
+                    <select id="sites-engineer-filter" class="form-select">
+                        <option value="">All Engineers</option>
+                    </select>
+                </div>
+                <div id="sites-table" class="table-responsive">
+                    <table class="table table-dark">
+                        <thead>
+                            <tr>
+                                <th>Site Name</th>
+                                <th>IP Address</th>
+                                <th>ISP</th>
+                                <th>Region</th>
+                                <th>Engineer</th>
+                                <th>Status</th>
+                                <th>Latency</th>
+                                <th>Last Check</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="sites-list"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ZONES SECTION -->
+            <div id="zones" class="content-section">
+                <div class="page-title">
+                    <h2><i class="fas fa-map-marked-alt"></i> Zones & Regions</h2>
+                    <button class="btn btn-primary" data-rbac="admin" onclick="showZoneModal()">
+                        <i class="fas fa-plus"></i> Add Zone
+                    </button>
+                </div>
+                <div id="zones-container"></div>
+            </div>
+
+            <!-- ENGINEERS SECTION -->
+            <div id="engineers" class="content-section">
+                <div class="page-title">
+                    <h2><i class="fas fa-users-cog"></i> Engineers</h2>
+                    <button class="btn btn-primary" data-rbac="admin" onclick="showEngineerModal()">
+                        <i class="fas fa-user-plus"></i> Add Engineer
+                    </button>
+                </div>
+                <div style="display: grid; grid-template-columns: minmax(240px, 1.4fr) minmax(160px, 1fr) minmax(160px, 1fr); gap: 12px; margin-bottom: 20px;">
+                    <input type="text" id="engineers-search" class="form-control" placeholder="Search engineer, email, phone, or team number...">
+                    <select id="engineers-zone-filter" class="form-select">
+                        <option value="">All Zones</option>
+                    </select>
+                    <select id="engineers-status-filter" class="form-select">
+                        <option value="">All Status</option>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                </div>
+                <div id="engineers-container"></div>
+            </div>
+
+            <!-- REPORTS SECTION -->
+            <div id="reports" class="content-section">
+                <div class="page-title">
+                    <h2><i class="fas fa-file-alt"></i> Reports</h2>
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <button class="btn btn-primary" data-rbac="write" onclick="downloadCSV()">
+                        <i class="fas fa-download"></i> Download CSV
+                    </button>
+                    <button class="btn btn-primary" style="margin-left: 10px;" data-rbac="write" onclick="downloadJSON()">
+                        <i class="fas fa-download"></i> Download JSON
+                    </button>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(3, minmax(160px, 1fr)) auto; gap: 12px; margin-bottom: 20px;">
+                    <input type="date" id="reports-date-filter" class="form-control" title="Filter by date">
+                    <select id="reports-year-filter" class="form-select">
+                        <option value="">All Years</option>
+                    </select>
+                    <select id="reports-status-filter" class="form-select">
+                        <option value="">All Status</option>
+                        <option value="online">Online</option>
+                        <option value="offline">Offline</option>
+                    </select>
+                    <button class="btn btn-secondary" onclick="clearReportFilters()">
+                        <i class="fas fa-times"></i> Clear
+                    </button>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-dark" id="reports-table">
+                        <thead>
+                            <tr>
+                                <th>Site Name</th>
+                                <th>Region</th>
+                                <th>ISP</th>
+                                <th>Engineer</th>
+                                <th>Status</th>
+                                <th>Timestamp</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reports-list"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- STATISTICS SECTION -->
+            <div id="statistics" class="content-section">
+                <div class="page-title">
+                    <h2><i class="fas fa-chart-bar"></i> Statistics</h2>
+                </div>
+                <div id="statistics-grid" class="row"></div>
+            </div>
+
+            <!-- USER MANAGEMENT SECTION -->
+            <div id="users" class="content-section">
+                <div class="page-title">
+                    <div>
+                        <h2><i class="fas fa-user-shield"></i> User Management</h2>
+                    </div>
+                    <button class="btn btn-primary" onclick="showCreateUserModal()">
+                        <i class="fas fa-user-plus"></i> Create User
+                    </button>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-dark">
+                        <thead>
+                            <tr>
+                                <th>Username</th>
+                                <th>Email</th>
+                                <th>Full Name</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th>Last Login</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="users-table"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- AUDIT LOGS SECTION -->
+            <div id="mail-settings" class="content-section">
+                <div class="page-title">
+                    <h2><i class="fas fa-envelope-open-text"></i> Mail Settings</h2>
+                    <button class="btn btn-primary" onclick="saveMailSettings()">
+                        <i class="fas fa-save"></i> Save Mail Settings
+                    </button>
+                </div>
+                <div class="stats-box">
+                    <form id="mailSettingsForm">
+                        <div class="industrial-form-grid">
+                            <div>
+                                <label class="form-label">SMTP Host</label>
+                                <input type="text" class="form-control" id="smtpHost" placeholder="smtp.gmail.com" required>
+                            </div>
+                            <div>
+                                <label class="form-label">SMTP Port</label>
+                                <input type="number" class="form-control" id="smtpPort" value="587" required>
+                            </div>
+                            <div>
+                                <label class="form-label">SMTP Username</label>
+                                <input type="email" class="form-control" id="smtpUser" placeholder="mail@company.com">
+                            </div>
+                            <div>
+                                <label class="form-label">From Email</label>
+                                <input type="email" class="form-control" id="smtpFrom" placeholder="mail@company.com" required>
+                            </div>
+                            <div>
+                                <label class="form-label">SMTP Password / App Password</label>
+                                <input type="password" class="form-control" id="smtpPassword" placeholder="Leave blank to keep saved password">
+                            </div>
+                            <div>
+                                <label class="form-label">Test Email</label>
+                                <input type="email" class="form-control" id="smtpTestEmail" placeholder="send-test-to@company.com">
+                            </div>
+                            <div>
+                                <label class="form-label">Link Down Alert Recipients</label>
+                                <input type="text" class="form-control" id="mailAlertRecipients" placeholder="admin@company.com, noc@company.com">
+                            </div>
+                            <div>
+                                <label class="form-label">Connection Security</label>
+                                <select class="form-select" id="smtpSecurity" onchange="onSmtpSecurityChange()">
+                                    <option value="starttls">STARTTLS (port 587)</option>
+                                    <option value="ssl">SSL / TLS (port 465)</option>
+                                    <option value="none">None (port 25)</option>
+                                </select>
+                                <input type="hidden" id="smtpUseTLS">
+                                <input type="hidden" id="smtpUseSSL">
+                            </div>
+                            <div>
+                                <label class="remember-me" style="color: #d8e8f2;">
+                                    <input type="checkbox" id="mailAlertsEnabled" class="form-checkbox">
+                                    <span>Send mail when link is down</span>
+                                </label>
+                            </div>
+                            <div>
+                                <label class="remember-me" style="color: #d8e8f2;">
+                                    <input type="checkbox" id="mailAlertOnRecovery" class="form-checkbox" checked>
+                                    <span>Send recovery mail when link is back online</span>
+                                </label>
+                            </div>
+                        </div>
+                    </form>
+                    <div class="title-actions" style="margin-top: 18px;">
+                        <button class="btn btn-secondary" onclick="testMailSettings()">
+                            <i class="fas fa-paper-plane"></i> Send Test Email
+                        </button>
+                        <span class="auto-refresh-label" id="smtpPasswordStatus">Password not saved</span>
+                    </div>
+                </div>
+            </div>
+
+            <div id="audit" class="content-section">
+                <div class="page-title">
+                    <h2><i class="fas fa-history"></i> Audit Logs</h2>
+                    <span class="badge-info">Total: <span id="log-count">0</span></span>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-dark">
+                        <thead>
+                            <tr>
+                                <th>Timestamp</th>
+                                <th>User</th>
+                                <th>Action</th>
+                                <th>Details</th>
+                                <th>IP Address</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="audit-table"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODALS -->
+    <!-- Create User Modal -->
+    <div class="modal fade" id="createUserModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Create New User</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="createUserForm">
+                        <div class="mb-3">
+                            <label class="form-label">Username</label>
+                            <input type="text" class="form-control" id="newUsername" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" id="newEmail" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Full Name</label>
+                            <input type="text" class="form-control" id="newFullName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Role</label>
+                            <select class="form-select" id="newRole" required>
+                                <option value="viewer">Viewer</option>
+                                <option value="engineer">Engineer</option>
+                                <option value="admin">Admin</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="createUser()">Create User</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Monitoring Site Modal -->
+    <div class="modal fade" id="addMonitoringSiteModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add New Site</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addMonitoringSiteForm">
+                        <datalist id="futureRegionOptions">
+                            <option value="Central Zone"></option>
+                            <option value="South"></option>
+                            <option value="North"></option>
+                            <option value="East"></option>
+                            <option value="West"></option>
+                        </datalist>
+                        <datalist id="futureEngineerOptions"></datalist>
+                        <div class="industrial-form-grid">
+                            <div>
+                                <label class="form-label">Site Name</label>
+                                <input type="text" class="form-control" id="monitorSiteName" placeholder="Site name" required>
+                            </div>
+                            <div>
+                                <label class="form-label">IP Address</label>
+                                <input type="text" class="form-control" id="monitorSiteIP" placeholder="Public IP address" required>
+                            </div>
+                            <div>
+                                <label class="form-label">ISP Name</label>
+                                <input type="text" class="form-control" id="monitorSiteISP" placeholder="ISP / provider" required>
+                            </div>
+                            <div>
+                                <label class="form-label">Zone</label>
+                                <input type="text" class="form-control" id="monitorSiteRegion" list="futureRegionOptions" placeholder="Zone / region" required>
+                            </div>
+                            <div>
+                                <label class="form-label">Engineer</label>
+                                <input type="text" class="form-control" id="monitorSiteEngineer" list="futureEngineerOptions" placeholder="Assigned engineer">
+                            </div>
+                            <div>
+                                <label class="form-label">Location</label>
+                                <input type="text" class="form-control" id="monitorSiteLocation" placeholder="Location / branch">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="saveMonitoringSite()">Add Site</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Monitoring Site Modal -->
+    <div class="modal fade" id="editMonitoringSiteModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Site</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editMonitoringSiteForm">
+                        <input type="hidden" id="editMonitorSiteId">
+                        <div class="industrial-form-grid">
+                            <div>
+                                <label class="form-label">Site Name</label>
+                                <input type="text" class="form-control" id="editMonitorSiteName" required>
+                            </div>
+                            <div>
+                                <label class="form-label">IP Address</label>
+                                <input type="text" class="form-control" id="editMonitorSiteIP" required>
+                            </div>
+                            <div>
+                                <label class="form-label">ISP Name</label>
+                                <input type="text" class="form-control" id="editMonitorSiteISP" required>
+                            </div>
+                            <div>
+                                <label class="form-label">Zone</label>
+                                <input type="text" class="form-control" id="editMonitorSiteRegion" list="futureRegionOptions" required>
+                            </div>
+                            <div>
+                                <label class="form-label">Engineer</label>
+                                <input type="text" class="form-control" id="editMonitorSiteEngineer" list="futureEngineerOptions">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="updateMonitoringSite()">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit User Modal -->
+    <div class="modal fade" id="editUserModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit User</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editUserForm">
+                        <div class="mb-3">
+                            <label class="form-label">Username</label>
+                            <input type="text" class="form-control" id="editUserUsername" disabled>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" id="editUserEmail" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Full Name</label>
+                            <input type="text" class="form-control" id="editUserFullName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Role</label>
+                            <select class="form-select" id="editUserRole" required>
+                                <option value="viewer">Viewer</option>
+                                <option value="engineer">Engineer</option>
+                                <option value="admin">Admin</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Status</label>
+                            <select class="form-select" id="editUserStatus" required>
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="saveEditedUser()">Save User</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Zone Modal -->
+    <div class="modal fade" id="editZoneModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="zoneModalTitle">Add Zone</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editZoneForm">
+                        <input type="hidden" id="originalZoneName">
+                        <div class="mb-3">
+                            <label class="form-label">Zone Name</label>
+                            <input type="text" class="form-control" id="editZoneName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Zone Code</label>
+                            <input type="text" class="form-control" id="editZoneCode" placeholder="e.g., CZ">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <input type="text" class="form-control" id="editZoneDescription">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Manager</label>
+                            <input type="text" class="form-control" id="editZoneManager">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Color</label>
+                            <input type="color" class="form-control form-control-color" id="editZoneColor" value="#0ea5e9">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="saveZone()">Save Zone</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Engineer Modal -->
+    <div class="modal fade" id="editEngineerModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="engineerModalTitle">Add Engineer</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editEngineerForm">
+                        <input type="hidden" id="originalEngineerName">
+                        <div class="mb-3">
+                            <label class="form-label">Engineer Name</label>
+                            <input type="text" class="form-control" id="editEngineerName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" id="editEngineerEmail">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Phone</label>
+                            <input type="text" class="form-control" id="editEngineerPhone">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Team Number</label>
+                            <input type="text" class="form-control" id="editEngineerTeamNumber" placeholder="Team contact / escalation number">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Zone / Region</label>
+                            <input type="text" class="form-control" id="editEngineerRegion" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Status</label>
+                            <input type="text" class="form-control" id="editEngineerStatus" placeholder="active">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="saveEngineer()">Save Engineer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Modal -->
+    <div class="modal fade" id="profileModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Profile Management</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="profileForm">
+                        <div class="mb-3">
+                            <label class="form-label">Username</label>
+                            <input type="text" class="form-control" id="profileUsername" disabled>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Full Name</label>
+                            <input type="text" class="form-control" id="profileFullName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" id="profileEmail" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Role</label>
+                            <input type="text" class="form-control" id="profileRole" disabled>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="saveProfile()">Save Profile</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Change Password Modal -->
+    <div class="modal fade" id="changePasswordModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Change Password</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="changePasswordForm">
+                        <div class="mb-3">
+                            <label class="form-label">Current Password</label>
+                            <input type="password" class="form-control" id="currentPassword" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">New Password</label>
+                            <input type="password" class="form-control" id="newPassword" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Confirm Password</label>
+                            <input type="password" class="form-control" id="confirmPassword" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="changePassword()">Change Password</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Reset Password Modal -->
+    <div class="modal fade" id="adminResetPasswordModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-key"></i> Reset Password</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p style="color:#9ca3af; margin-bottom:16px;">
+                        Setting new password for: <strong id="resetPwUsername" style="color:#7dd3fc;"></strong>
+                    </p>
+                    <div class="mb-3">
+                        <label class="form-label">New Password</label>
+                        <div class="input-group">
+                            <input type="password" class="form-control" id="resetPwNew" placeholder="Min 8 chars, upper, lower, digit, special">
+                            <button class="btn btn-outline-secondary" type="button" onclick="togglePwVisibility('resetPwNew', this)">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Confirm Password</label>
+                        <div class="input-group">
+                            <input type="password" class="form-control" id="resetPwConfirm" placeholder="Re-enter new password">
+                            <button class="btn btn-outline-secondary" type="button" onclick="togglePwVisibility('resetPwConfirm', this)">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="resetPwError" style="color:#f87171; font-size:13px; display:none;"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-warning" onclick="submitAdminPasswordReset()">
+                        <i class="fas fa-key"></i> Reset Password
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+    <script>
+        let allSitesData = [];
+        let engineersData = [];
+        let zonesData = [];
+        let usersData = [];
+        let reportsData = [];
+        let activeSection = 'dashboard';
+        window.userRole = 'viewer'; // safe default; overwritten by loadDashboard()
+        let siteHealthChart;
+        let zoneHealthChart;
+        let downtimeChart;
+        let topDowntimeChart;
+        const AUTO_REFRESH_MS = 10000;
+        let sessionExpiredRedirecting = false;
+
+        async function apiFetch(url, options = {}) {
+            const res = await fetch(url, options);
+            if (res.status === 401 && !sessionExpiredRedirecting) {
+                sessionExpiredRedirecting = true;
+                showMessage('Session expired. Redirecting to login…', 'error');
+                setTimeout(() => { window.location.href = '/login'; }, 1500);
+            }
+            return res;
+        }
+
+        function applyRbac(role) {
+            window.userRole = role;
+            // Admin-only elements: hide from engineer and viewer
+            if (role !== 'admin') {
+                document.querySelectorAll('[data-rbac="admin"]').forEach(el => el.style.display = 'none');
+            }
+            // Write elements (admin + engineer): hide from viewer only
+            if (role === 'viewer') {
+                document.querySelectorAll('[data-rbac="write"]').forEach(el => el.style.display = 'none');
+            }
+        }
+
+        async function loadCompanyLogo() {
+            try {
+                const res = await apiFetch('/api/company/info');
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.has_logo) {
+                        document.getElementById('companyLogo').innerHTML = `<img src="/api/company/logo?t=${Date.now()}" alt="Company Logo">`;
+                    }
+                }
+            } catch (e) {
+                console.log('Logo not set, using default');
+            }
+        }
+
+        function selectCompanyLogo(e) {
+            e.preventDefault();
+            document.getElementById('companyLogoInput').click();
+        }
+
+        async function uploadCompanyLogo() {
+            const input = document.getElementById('companyLogoInput');
+            if (!input.files.length) return;
+
+            const formData = new FormData();
+            formData.append('file', input.files[0]);
+
+            const res = await apiFetch('/api/company/logo', {
+                method: 'POST',
+                body: formData
+            });
+            const data = await res.json();
+            if (res.ok) {
+                loadCompanyLogo();
+                alert('Company logo uploaded successfully!');
+            } else {
+                alert('Logo upload failed: ' + (data.error || 'Unknown error'));
+            }
+            input.value = '';
+        }
+
+        async function loadDashboard() {
+            const res = await apiFetch('/api/dashboard');
+            const data = await res.json();
+            document.getElementById('userName').textContent = data.full_name || data.user;
+            document.getElementById('userRole').textContent = data.role;
+            applyRbac(data.role);
+            loadStatistics();
+            loadDashboardCharts();
+            loadCompanyLogo();
+        }
+
+        async function refreshSection(section = activeSection) {
+            if (section === 'dashboard') await Promise.all([loadStatistics(), loadDashboardCharts()]);
+            else if (section === 'all-sites') await loadAllSites();
+            else if (section === 'zones') await loadZones();
+            else if (section === 'engineers') await loadEngineers();
+            else if (section === 'reports') await loadReports();
+            else if (section === 'statistics') await loadStatistics();
+            else if (section === 'users') await loadUsers();
+            else if (section === 'mail-settings') await loadMailSettings();
+            else if (section === 'audit') await loadAuditLogs();
+        }
+
+        async function manualRefreshActiveSection() {
+            const buttons = document.querySelectorAll('.refresh-button');
+            buttons.forEach(btn => btn.classList.add('refreshing'));
+            try {
+                await refreshSection(activeSection);
+                showMessage('Refreshed successfully', 'success');
+            } finally {
+                buttons.forEach(btn => btn.classList.remove('refreshing'));
+            }
+        }
+
+        async function loadAllSites() {
+            const res = await apiFetch('/api/sites');
+            const data = await res.json();
+            allSitesData = data.sites || data;
+            populateSiteFilters();
+            applySiteFilters();
+        }
+
+        function populateSiteFilters() {
+            const zoneSelect = document.getElementById('sites-zone-filter');
+            const engineerSelect = document.getElementById('sites-engineer-filter');
+            if (!zoneSelect || !engineerSelect) return;
+
+            const currentZone = zoneSelect.value;
+            const currentEngineer = engineerSelect.value;
+            const zones = [...new Set(allSitesData.map(s => s.region).filter(Boolean))].sort();
+            const engineers = [...new Set(allSitesData.map(s => s.engineer).filter(Boolean))].sort();
+
+            zoneSelect.innerHTML = '<option value="">All Zones</option>' + zones.map(zone => `<option value="${zone}">${zone}</option>`).join('');
+            engineerSelect.innerHTML = '<option value="">All Engineers</option>' + engineers.map(engineer => `<option value="${engineer}">${engineer}</option>`).join('');
+
+            if (zones.includes(currentZone)) zoneSelect.value = currentZone;
+            if (engineers.includes(currentEngineer)) engineerSelect.value = currentEngineer;
+        }
+
+        function applySiteFilters() {
+            const query = document.getElementById('sites-search')?.value.toLowerCase().trim() || '';
+            const status = document.getElementById('sites-status-filter')?.value || '';
+            const zone = document.getElementById('sites-zone-filter')?.value || '';
+            const engineer = document.getElementById('sites-engineer-filter')?.value || '';
+
+            const filtered = allSitesData.filter(s => {
+                const matchesSearch = !query ||
+                    (s.name || '').toLowerCase().includes(query) ||
+                    (s.ip || '').toLowerCase().includes(query) ||
+                    (s.isp || '').toLowerCase().includes(query);
+                const matchesStatus = !status || s.status === status;
+                const matchesZone = !zone || s.region === zone;
+                const matchesEngineer = !engineer || s.engineer === engineer;
+                return matchesSearch && matchesStatus && matchesZone && matchesEngineer;
+            });
+
+            renderAllSites(filtered);
+        }
+
+        async function showSitesByStatus(status) {
+            document.getElementById('sites-search').value = '';
+            document.getElementById('sites-status-filter').value = status || '';
+            document.getElementById('sites-zone-filter').value = '';
+            document.getElementById('sites-engineer-filter').value = '';
+            switchSection('all-sites');
+        }
+
+        function renderAllSites(sites) {
+            document.getElementById('sites-list').innerHTML = sites.length ? sites.map(s => `
+                <tr>
+                    <td><strong>${s.name}</strong></td>
+                    <td><code>${s.ip}</code></td>
+                    <td>${s.isp}</td>
+                    <td>${s.region}</td>
+                    <td>${s.engineer}</td>
+                    <td><span class="status-badge status-${s.status}">${s.status.toUpperCase()}</span></td>
+                    <td>${s.latency ? s.latency + 'ms' : '--'}</td>
+                    <td class="timestamp">${s.ts}</td>
+                    <td>
+                        ${window.userRole === 'admin' ? `
+                        <div class="action-buttons">
+                            <button class="btn-sm btn-edit" onclick="editMonitoringSite('${encodeURIComponent(s.site_id)}')">
+                                Edit
+                            </button>
+                            <button class="btn-sm btn-delete" onclick="deleteMonitoringSite('${encodeURIComponent(s.site_id)}')">
+                                Delete
+                            </button>
+                        </div>` : ''}
+                    </td>
+                </tr>
+            `).join('') : `
+                <tr>
+                    <td colspan="9" class="text-center" style="color: #64748b; padding: 24px;">No sites match the selected filters.</td>
+                </tr>
+            `;
+        }
+
+        async function loadZones() {
+            const res = await apiFetch('/api/zones');
+            zonesData = await res.json();
+            document.getElementById('futureRegionOptions').innerHTML = zonesData.map(z => `<option value="${z.name}"></option>`).join('');
+            document.getElementById('zones-container').innerHTML = zonesData.map(z => `
+                <div class="stats-box" style="border-left-color: ${z.color};">
+                    <div style="display: flex; justify-content: space-between; gap: 12px; align-items: center;">
+                        <div style="color: ${z.color}; font-weight: bold;">${z.name}</div>
+                        ${window.userRole === 'admin' ? `<button class="btn-sm btn-edit" style="max-width: 90px;" onclick="editZone('${encodeURIComponent(z.name)}')"><i class="fas fa-edit"></i> Edit</button>` : ''}
+                    </div>
+                    <div style="font-size: 12px; color: #9ca3af; margin-top: 5px;">${z.description}</div>
+                    <div style="font-size: 12px; color: #64748b; margin-top: 8px;">
+                        <i class="fas fa-user"></i> Manager: <strong>${z.manager}</strong>
+                    </div>
+                    <div style="font-size: 12px; color: #64748b; margin-top: 8px;">
+                        Sites: <strong>${z.total_sites}</strong> | Online: <strong>${z.online}</strong> | Offline: <strong>${z.offline}</strong>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function loadEngineers() {
+            const res = await apiFetch('/api/engineers');
+            engineersData = await res.json();
+            document.getElementById('futureEngineerOptions').innerHTML = engineersData.map(e => `<option value="${e.name}"></option>`).join('');
+            populateEngineerFilters();
+            applyEngineerFilters();
+        }
+
+        function populateEngineerFilters() {
+            const zoneSelect = document.getElementById('engineers-zone-filter');
+            if (!zoneSelect) return;
+
+            const currentZone = zoneSelect.value;
+            const zones = [...new Set(engineersData.map(e => e.region).filter(Boolean))].sort();
+            zoneSelect.innerHTML = '<option value="">All Zones</option>' + zones.map(zone => `<option value="${zone}">${zone}</option>`).join('');
+            if (zones.includes(currentZone)) zoneSelect.value = currentZone;
+        }
+
+        function applyEngineerFilters() {
+            const query = document.getElementById('engineers-search')?.value.toLowerCase().trim() || '';
+            const zone = document.getElementById('engineers-zone-filter')?.value || '';
+            const status = document.getElementById('engineers-status-filter')?.value || '';
+
+            const filtered = engineersData.filter(e => {
+                const matchesSearch = !query ||
+                    (e.name || '').toLowerCase().includes(query) ||
+                    (e.email || '').toLowerCase().includes(query) ||
+                    (e.phone || '').toLowerCase().includes(query) ||
+                    (e.team_number || '').toLowerCase().includes(query);
+                const matchesZone = !zone || e.region === zone;
+                const matchesStatus = !status || e.status === status;
+                return matchesSearch && matchesZone && matchesStatus;
+            });
+
+            renderEngineers(filtered);
+        }
+
+        function renderEngineers(engineers) {
+            document.getElementById('engineers-container').innerHTML = engineers.length ? engineers.map(e => `
+                <div class="stats-box">
+                    <div style="display: flex; justify-content: space-between; gap: 12px; align-items: center;">
+                        <div style="color: #7dd3fc; font-weight: bold; font-size: 16px;">${e.name}</div>
+                        ${window.userRole === 'admin' ? `<button class="btn-sm btn-edit" style="max-width: 90px;" onclick="editEngineer('${encodeURIComponent(e.name)}')"><i class="fas fa-edit"></i> Edit</button>` : ''}
+                    </div>
+                    <div style="font-size: 12px; color: #9ca3af; margin-top: 8px;">
+                        <div><i class="fas fa-map-marked-alt"></i> Region: <strong>${e.region}</strong></div>
+                        <div><i class="fas fa-envelope"></i> ${e.email}</div>
+                        <div><i class="fas fa-phone"></i> ${e.phone}</div>
+                        ${e.team_number ? `<div><i class="fas fa-users"></i> Team Number: <strong>${e.team_number}</strong></div>` : ''}
+                        <div><i class="fas fa-network-wired"></i> Assigned Sites: <strong>${e.assigned_sites}</strong></div>
+                        <div><i class="fas fa-circle" style="color: #38bdf8;"></i> <strong style="color: #7dd3fc;">${e.status.toUpperCase()}</strong></div>
+                    </div>
+                </div>
+            `).join('') : `
+                <div class="loading">No engineers match the selected filters.</div>
+            `;
+        }
+
+        function showZoneModal() {
+            document.getElementById('zoneModalTitle').textContent = 'Add Zone';
+            document.getElementById('originalZoneName').value = '';
+            document.getElementById('editZoneForm').reset();
+            document.getElementById('editZoneColor').value = '#0ea5e9';
+            new bootstrap.Modal(document.getElementById('editZoneModal')).show();
+        }
+
+        function editZone(encodedName) {
+            const zoneName = decodeURIComponent(encodedName);
+            const zone = zonesData.find(z => z.name === zoneName);
+            if (!zone) {
+                alert('Zone not found');
+                return;
+            }
+
+            document.getElementById('zoneModalTitle').textContent = 'Edit Zone';
+            document.getElementById('originalZoneName').value = zone.name;
+            document.getElementById('editZoneName').value = zone.name || '';
+            document.getElementById('editZoneCode').value = zone.code || '';
+            document.getElementById('editZoneDescription').value = zone.description || '';
+            document.getElementById('editZoneManager').value = zone.manager || '';
+            document.getElementById('editZoneColor').value = zone.color || '#0ea5e9';
+            new bootstrap.Modal(document.getElementById('editZoneModal')).show();
+        }
+
+        async function saveZone() {
+            const originalName = document.getElementById('originalZoneName').value;
+            const payload = {
+                name: document.getElementById('editZoneName').value.trim(),
+                region_code: document.getElementById('editZoneCode').value.trim(),
+                description: document.getElementById('editZoneDescription').value.trim(),
+                manager: document.getElementById('editZoneManager').value.trim(),
+                color: document.getElementById('editZoneColor').value
+            };
+
+            if (!payload.name) {
+                alert('Zone name is required');
+                return;
+            }
+
+            const res = await apiFetch(originalName ? `/api/zones/${encodeURIComponent(originalName)}` : '/api/zones', {
+                method: originalName ? 'PUT' : 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (res.ok) {
+                bootstrap.Modal.getInstance(document.getElementById('editZoneModal')).hide();
+                loadZones();
+                loadEngineers();
+                loadAllSites();
+                alert('Zone saved successfully!');
+            } else {
+                alert('Zone save failed: ' + (data.error || 'Unknown error'));
+            }
+        }
+
+        function showEngineerModal() {
+            document.getElementById('engineerModalTitle').textContent = 'Add Engineer';
+            document.getElementById('originalEngineerName').value = '';
+            document.getElementById('editEngineerForm').reset();
+            document.getElementById('editEngineerStatus').value = 'active';
+            new bootstrap.Modal(document.getElementById('editEngineerModal')).show();
+        }
+
+        function editEngineer(encodedName) {
+            const engineerName = decodeURIComponent(encodedName);
+            const engineer = engineersData.find(e => e.name === engineerName);
+            if (!engineer) {
+                alert('Engineer not found');
+                return;
+            }
+
+            document.getElementById('engineerModalTitle').textContent = 'Edit Engineer';
+            document.getElementById('originalEngineerName').value = engineer.name;
+            document.getElementById('editEngineerName').value = engineer.name || '';
+            document.getElementById('editEngineerEmail').value = engineer.email || '';
+            document.getElementById('editEngineerPhone').value = engineer.phone || '';
+            document.getElementById('editEngineerTeamNumber').value = engineer.team_number || '';
+            document.getElementById('editEngineerRegion').value = engineer.region || '';
+            document.getElementById('editEngineerStatus').value = engineer.status || 'active';
+            new bootstrap.Modal(document.getElementById('editEngineerModal')).show();
+        }
+
+        async function saveEngineer() {
+            const originalName = document.getElementById('originalEngineerName').value;
+            const payload = {
+                name: document.getElementById('editEngineerName').value.trim(),
+                email: document.getElementById('editEngineerEmail').value.trim(),
+                phone: document.getElementById('editEngineerPhone').value.trim(),
+                team_number: document.getElementById('editEngineerTeamNumber').value.trim(),
+                region: document.getElementById('editEngineerRegion').value.trim(),
+                status: document.getElementById('editEngineerStatus').value.trim() || 'active'
+            };
+
+            if (!payload.name || !payload.region) {
+                alert('Engineer name and region are required');
+                return;
+            }
+
+            const res = await apiFetch(originalName ? `/api/engineers/${encodeURIComponent(originalName)}` : '/api/engineers', {
+                method: originalName ? 'PUT' : 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (res.ok) {
+                bootstrap.Modal.getInstance(document.getElementById('editEngineerModal')).hide();
+                loadEngineers();
+                loadAllSites();
+                alert('Engineer updated successfully!');
+            } else {
+                alert('Engineer update failed: ' + (data.error || 'Unknown error'));
+            }
+        }
+
+        function showMessage(message, type) {
+            const toast = document.getElementById('app-toast');
+            if (toast) {
+                toast.textContent = message;
+                toast.className = `app-toast ${type}`;
+                toast.style.display = 'block';
+                setTimeout(() => {
+                    toast.style.display = 'none';
+                }, 4000);
+            }
+
+            const msgElement = document.getElementById(type === 'success' ? 'success-message' : 'error-message');
+            if (!msgElement) return;
+            msgElement.textContent = message;
+            msgElement.style.display = 'block';
+            setTimeout(() => {
+                msgElement.style.display = 'none';
+            }, 4000);
+        }
+
+        function showMonitoringSiteModal() {
+            loadZones();
+            loadEngineers();
+            document.getElementById('addMonitoringSiteForm').reset();
+            new bootstrap.Modal(document.getElementById('addMonitoringSiteModal')).show();
+        }
+
+        async function saveMonitoringSite() {
+            const payload = {
+                name: document.getElementById('monitorSiteName').value.trim(),
+                ip: document.getElementById('monitorSiteIP').value.trim(),
+                isp: document.getElementById('monitorSiteISP').value.trim(),
+                region: document.getElementById('monitorSiteRegion').value.trim(),
+                engineer: document.getElementById('monitorSiteEngineer').value.trim(),
+                location: document.getElementById('monitorSiteLocation').value.trim()
+            };
+
+            if (!payload.name || !payload.ip || !payload.isp || !payload.region) {
+                showMessage('Site name, IP address, ISP, and zone are required', 'error');
+                return;
+            }
+
+            const res = await apiFetch('/api/sites/add', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json().catch(() => ({}));
+            if (res.ok) {
+                bootstrap.Modal.getInstance(document.getElementById('addMonitoringSiteModal')).hide();
+                showMessage('Monitoring site added successfully!', 'success');
+                loadAllSites();
+                loadStatistics();
+            } else {
+                showMessage('Site add failed: ' + (data.error || 'Unknown error'), 'error');
+            }
+        }
+
+        function editMonitoringSite(encodedSiteId) {
+            const siteId = decodeURIComponent(encodedSiteId);
+            const site = allSitesData.find(s => s.site_id === siteId);
+            if (!site) {
+                showMessage('Site not found. Refreshing site list.', 'error');
+                loadAllSites();
+                return;
+            }
+
+            loadZones();
+            loadEngineers();
+            document.getElementById('editMonitorSiteId').value = site.site_id;
+            document.getElementById('editMonitorSiteName').value = site.name || '';
+            document.getElementById('editMonitorSiteIP').value = site.ip || '';
+            document.getElementById('editMonitorSiteISP').value = site.isp || '';
+            document.getElementById('editMonitorSiteRegion').value = site.region || '';
+            document.getElementById('editMonitorSiteEngineer').value = site.engineer || '';
+            new bootstrap.Modal(document.getElementById('editMonitoringSiteModal')).show();
+        }
+
+        async function updateMonitoringSite() {
+            const siteId = document.getElementById('editMonitorSiteId').value;
+            const payload = {
+                name: document.getElementById('editMonitorSiteName').value.trim(),
+                ip: document.getElementById('editMonitorSiteIP').value.trim(),
+                isp: document.getElementById('editMonitorSiteISP').value.trim(),
+                region: document.getElementById('editMonitorSiteRegion').value.trim(),
+                engineer: document.getElementById('editMonitorSiteEngineer').value.trim()
+            };
+
+            if (!payload.name || !payload.ip || !payload.isp || !payload.region) {
+                showMessage('Site name, IP address, ISP, and zone are required', 'error');
+                return;
+            }
+
+            const res = await apiFetch(`/api/sites/${encodeURIComponent(siteId)}`, {
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json().catch(() => ({}));
+            if (res.ok) {
+                bootstrap.Modal.getInstance(document.getElementById('editMonitoringSiteModal')).hide();
+                showMessage('Monitoring site updated successfully!', 'success');
+                loadAllSites();
+                loadStatistics();
+            } else {
+                showMessage('Site update failed: ' + (data.error || 'Unknown error'), 'error');
+            }
+        }
+
+        async function deleteMonitoringSite(encodedSiteId) {
+            const siteId = decodeURIComponent(encodedSiteId);
+            const siteName = allSitesData.find(s => s.site_id === siteId)?.name || siteId;
+            if (!confirm(`Delete "${siteName}" from monitoring? This cannot be undone.`)) {
+                return;
+            }
+
+            const res = await apiFetch(`/api/sites/${encodeURIComponent(siteId)}`, {
+                method: 'DELETE'
+            });
+            const data = await res.json().catch(() => ({}));
+            if (res.ok) {
+                showMessage('Monitoring site deleted successfully!', 'success');
+                loadAllSites();
+                loadStatistics();
+            } else {
+                showMessage('Site delete failed: ' + (data.error || 'Unknown error'), 'error');
+            }
+        }
+
+        async function loadReports() {
+            const res = await apiFetch('/api/reports');
+            reportsData = await res.json();
+            populateReportYearFilter();
+            applyReportFilters();
+        }
+
+        function reportDateParts(timestamp) {
+            const value = String(timestamp || '');
+            return {
+                date: value.slice(0, 10),
+                year: value.slice(0, 4)
+            };
+        }
+
+        function populateReportYearFilter() {
+            const yearSelect = document.getElementById('reports-year-filter');
+            const currentYear = yearSelect.value;
+            const years = [...new Set(reportsData.map(r => reportDateParts(r.timestamp).year).filter(Boolean))].sort().reverse();
+            yearSelect.innerHTML = '<option value="">All Years</option>' + years.map(year => `<option value="${year}">${year}</option>`).join('');
+            if (years.includes(currentYear)) yearSelect.value = currentYear;
+        }
+
+        function applyReportFilters() {
+            const date = document.getElementById('reports-date-filter')?.value || '';
+            const year = document.getElementById('reports-year-filter')?.value || '';
+            const status = document.getElementById('reports-status-filter')?.value || '';
+            const filtered = reportsData.filter(report => {
+                const parts = reportDateParts(report.timestamp);
+                return (!date || parts.date === date) &&
+                    (!year || parts.year === year) &&
+                    (!status || report.status === status);
+            });
+
+            document.getElementById('reports-list').innerHTML = filtered.length ? filtered.map(r => `
+                <tr>
+                    <td><strong>${r.site}</strong></td>
+                    <td>${r.region}</td>
+                    <td>${r.isp}</td>
+                    <td>${r.engineer}</td>
+                    <td><span class="status-badge status-${r.status}">${r.status.toUpperCase()}</span></td>
+                    <td class="timestamp">${r.timestamp}</td>
+                </tr>
+            `).join('') : `
+                <tr>
+                    <td colspan="6" class="text-center" style="color: #64748b; padding: 24px;">No reports match the selected filters.</td>
+                </tr>
+            `;
+        }
+
+        function clearReportFilters() {
+            document.getElementById('reports-date-filter').value = '';
+            document.getElementById('reports-year-filter').value = '';
+            document.getElementById('reports-status-filter').value = '';
+            applyReportFilters();
+        }
+
+        function chartOptions(yTitle) {
+            return {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        labels: {color: '#d8e8f2'}
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks: {color: '#a9bdca'},
+                        grid: {color: 'rgba(169, 189, 202, 0.08)'}
+                    },
+                    y: {
+                        beginAtZero: true,
+                        title: {display: Boolean(yTitle), text: yTitle, color: '#a9bdca'},
+                        ticks: {color: '#a9bdca'},
+                        grid: {color: 'rgba(169, 189, 202, 0.08)'}
+                    }
+                }
+            };
+        }
+
+        async function loadDashboardCharts() {
+            if (typeof Chart === 'undefined') return;
+
+            const res = await apiFetch('/api/dashboard/charts');
+            if (!res.ok) return;
+            const data = await res.json();
+
+            siteHealthChart?.destroy();
+            siteHealthChart = new Chart(document.getElementById('siteHealthChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Online', 'Offline'],
+                    datasets: [{
+                        data: [data.status.online, data.status.offline],
+                        backgroundColor: ['#14b8a6', '#ff1744'],
+                        borderColor: '#203647',
+                        borderWidth: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {legend: {position: 'bottom', labels: {color: '#d8e8f2'}}}
+                }
+            });
+
+            zoneHealthChart?.destroy();
+            zoneHealthChart = new Chart(document.getElementById('zoneHealthChart'), {
+                type: 'bar',
+                data: {
+                    labels: data.zone_health.map(zone => zone.zone),
+                    datasets: [
+                        {label: 'Online', data: data.zone_health.map(zone => zone.online), backgroundColor: '#14b8a6'},
+                        {label: 'Offline', data: data.zone_health.map(zone => zone.offline), backgroundColor: '#ff1744'},
+                        {label: 'Checking', data: data.zone_health.map(zone => zone.checking), backgroundColor: '#f59e0b'}
+                    ]
+                },
+                options: {...chartOptions('Sites'), scales: {...chartOptions('Sites').scales, x: {...chartOptions('Sites').scales.x, stacked: true}, y: {...chartOptions('Sites').scales.y, stacked: true}}}
+            });
+
+            downtimeChart?.destroy();
+            downtimeChart = new Chart(document.getElementById('downtimeChart'), {
+                type: 'line',
+                data: {
+                    labels: data.downtime.labels,
+                    datasets: [
+                        {
+                            label: 'Downtime Minutes',
+                            data: data.downtime.minutes,
+                            borderColor: '#ff1744',
+                            backgroundColor: 'rgba(255, 23, 68, 0.18)',
+                            fill: true,
+                            tension: 0.3
+                        },
+                        {
+                            label: 'Offline Incidents',
+                            data: data.downtime.incidents,
+                            borderColor: '#f59e0b',
+                            backgroundColor: '#f59e0b',
+                            tension: 0.3
+                        }
+                    ]
+                },
+                options: chartOptions('Minutes / Incidents')
+            });
+
+            topDowntimeChart?.destroy();
+            topDowntimeChart = new Chart(document.getElementById('topDowntimeChart'), {
+                type: 'bar',
+                data: {
+                    labels: data.top_downtime_sites.labels.length ? data.top_downtime_sites.labels : ['No downtime recorded'],
+                    datasets: [{
+                        label: 'Downtime Minutes',
+                        data: data.top_downtime_sites.minutes.length ? data.top_downtime_sites.minutes : [0],
+                        backgroundColor: '#ff1744'
+                    }]
+                },
+                options: chartOptions('Minutes')
+            });
+        }
+
+        async function loadStatistics() {
+            const res = await apiFetch('/api/statistics');
+            const stats = await res.json();
+            const html = `
+                <div class="col-md-6 col-lg-3">
+                    <div class="stats-box" onclick="showSitesByStatus('')" style="cursor: pointer;">
+                        <div class="stats-number">${stats.total_sites}</div>
+                        <div class="stats-label">Total Sites</div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="stats-box" onclick="showSitesByStatus('online')" style="border-left-color: #38bdf8; cursor: pointer;">
+                        <div class="stats-number" style="color: #7dd3fc;">${stats.online_sites}</div>
+                        <div class="stats-label">Online</div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="stats-box" onclick="showSitesByStatus('offline')" style="border-left-color: #ff1744; cursor: pointer;">
+                        <div class="stats-number" style="color: #ff1744;">${stats.offline_sites}</div>
+                        <div class="stats-label">Offline</div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="stats-box" style="border-left-color: #f59e0b;">
+                        <div class="stats-number" style="color: #f59e0b;">${stats.uptime_percentage}%</div>
+                        <div class="stats-label">Uptime</div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="stats-box" style="border-left-color: #FF9800;">
+                        <div class="stats-number" style="color: #FF9800;">${stats.total_engineers}</div>
+                        <div class="stats-label">Engineers</div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="stats-box" style="border-left-color: #9C27B0;">
+                        <div class="stats-number" style="color: #9C27B0;">${stats.total_zones}</div>
+                        <div class="stats-label">Zones</div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="stats-box" style="border-left-color: #F44336;">
+                        <div class="stats-number" style="color: #F44336;">${stats.total_incidents}</div>
+                        <div class="stats-label">Incidents</div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('stats-grid').innerHTML = html;
+            const statsGrid2 = document.getElementById('statistics-grid');
+            if (statsGrid2) statsGrid2.innerHTML = html;
+        }
+
+        async function loadUsers() {
+            const res = await apiFetch('/api/admin/users');
+            if (res.status === 403) {
+                alert('Insufficient permissions');
+                return;
+            }
+            usersData = await res.json();
+            document.getElementById('users-table').innerHTML = usersData.map(u => `
+                <tr class="user-row">
+                    <td><strong>${u.username}</strong></td>
+                    <td>${u.email}</td>
+                    <td>${u.full_name}</td>
+                    <td><span class="role-badge role-${u.role}">${u.role}</span></td>
+                    <td><span class="status-badge status-${u.status}">${u.status.toUpperCase()}</span></td>
+                    <td class="timestamp">${u.last_login ? new Date(u.last_login).toLocaleDateString() : 'Never'}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn-sm btn-edit" onclick="editUser('${u.username}')">Edit</button>
+                            <button class="btn-sm btn-lock" onclick="toggleUserLock('${u.username}', '${u.status}')">
+                                ${u.status === 'active' ? 'Lock' : 'Unlock'}
+                            </button>
+                            <button class="btn-sm btn-delete" onclick="resetUserPassword('${u.username}')">Reset PW</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function editUser(username) {
+            const user = usersData.find(u => u.username === username);
+            if (!user) {
+                showMessage('User not found. Refreshing user list.', 'error');
+                loadUsers();
+                return;
+            }
+
+            document.getElementById('editUserUsername').value = user.username || '';
+            document.getElementById('editUserEmail').value = user.email || '';
+            document.getElementById('editUserFullName').value = user.full_name || '';
+            document.getElementById('editUserRole').value = user.role || 'viewer';
+            document.getElementById('editUserStatus').value = user.status || 'active';
+            new bootstrap.Modal(document.getElementById('editUserModal')).show();
+        }
+
+        async function saveEditedUser() {
+            const username = document.getElementById('editUserUsername').value;
+            const payload = {
+                email: document.getElementById('editUserEmail').value.trim(),
+                full_name: document.getElementById('editUserFullName').value.trim(),
+                role: document.getElementById('editUserRole').value,
+                status: document.getElementById('editUserStatus').value
+            };
+
+            if (!payload.email || !payload.full_name) {
+                showMessage('Email and full name are required', 'error');
+                return;
+            }
+
+            const res = await apiFetch(`/api/admin/users/${encodeURIComponent(username)}/edit`, {
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json().catch(() => ({}));
+            if (res.ok) {
+                bootstrap.Modal.getInstance(document.getElementById('editUserModal')).hide();
+                showMessage('User updated successfully', 'success');
+                loadUsers();
+                loadAuditLogs();
+            } else {
+                showMessage('User update failed: ' + (data.error || 'Unknown error'), 'error');
+            }
+        }
+
+        function onSmtpSecurityChange() {
+            const security = document.getElementById('smtpSecurity').value;
+            const portEl = document.getElementById('smtpPort');
+            if (security === 'starttls') {
+                if (portEl.value === '465' || portEl.value === '25') portEl.value = '587';
+            } else if (security === 'ssl') {
+                if (portEl.value === '587' || portEl.value === '25') portEl.value = '465';
+            } else {
+                if (portEl.value === '587' || portEl.value === '465') portEl.value = '25';
+            }
+        }
+
+        function smtpSecurityFromFlags(use_tls, use_ssl, port) {
+            if (use_ssl && !use_tls) return 'ssl';
+            if (use_tls && !use_ssl) return 'starttls';
+            // Both true or ambiguous — pick based on port
+            if (use_ssl || use_tls) return (port === 465) ? 'ssl' : 'starttls';
+            return 'none';
+        }
+
+        async function loadMailSettings() {
+            const res = await apiFetch('/api/admin/mail-settings');
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok) {
+                showMessage('Mail settings load failed: ' + (data.error || 'Unknown error'), 'error');
+                return;
+            }
+
+            document.getElementById('smtpHost').value = data.smtp_host || '';
+            document.getElementById('smtpPort').value = data.smtp_port || 587;
+            document.getElementById('smtpUser').value = data.smtp_user || '';
+            document.getElementById('smtpFrom').value = data.smtp_from || data.smtp_user || '';
+            document.getElementById('smtpPassword').value = '';
+            document.getElementById('smtpSecurity').value = smtpSecurityFromFlags(data.smtp_use_tls, data.smtp_use_ssl, data.smtp_port);
+            document.getElementById('mailAlertsEnabled').checked = !!data.alerts_enabled;
+            document.getElementById('mailAlertRecipients').value = data.alert_recipients || '';
+            document.getElementById('mailAlertOnRecovery').checked = !!data.alert_on_recovery;
+            document.getElementById('smtpPasswordStatus').textContent = data.password_configured ? 'Password saved' : 'Password not saved';
+        }
+
+        async function saveMailSettings() {
+            const security = document.getElementById('smtpSecurity').value;
+            const payload = {
+                smtp_host: document.getElementById('smtpHost').value.trim(),
+                smtp_port: Number(document.getElementById('smtpPort').value || 587),
+                smtp_user: document.getElementById('smtpUser').value.trim(),
+                smtp_from: document.getElementById('smtpFrom').value.trim(),
+                smtp_password: document.getElementById('smtpPassword').value,
+                smtp_use_tls: security === 'starttls',
+                smtp_use_ssl: security === 'ssl',
+                alerts_enabled: document.getElementById('mailAlertsEnabled').checked,
+                alert_recipients: document.getElementById('mailAlertRecipients').value.trim(),
+                alert_on_recovery: document.getElementById('mailAlertOnRecovery').checked
+            };
+
+            if (!payload.smtp_host || !payload.smtp_from) {
+                showMessage('SMTP host and from email are required', 'error');
+                return;
+            }
+            if (payload.alerts_enabled && !payload.alert_recipients) {
+                showMessage('Add alert recipient email addresses', 'error');
+                return;
+            }
+
+            const res = await apiFetch('/api/admin/mail-settings', {
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json().catch(() => ({}));
+            if (res.ok) {
+                document.getElementById('smtpPassword').value = '';
+                showMessage('Mail settings saved successfully', 'success');
+                loadMailSettings();
+            } else {
+                showMessage('Mail settings save failed: ' + (data.error || 'Unknown error'), 'error');
+            }
+        }
+
+        async function testMailSettings() {
+            const email = document.getElementById('smtpTestEmail').value.trim() || document.getElementById('smtpFrom').value.trim();
+            if (!email) {
+                showMessage('Enter a test email address', 'error');
+                return;
+            }
+
+            const res = await apiFetch('/api/admin/mail-settings/test', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({email})
+            });
+            const data = await res.json().catch(() => ({}));
+            if (res.ok) {
+                showMessage('Test email sent successfully', 'success');
+            } else {
+                showMessage('Test email failed: ' + (data.error || 'Unknown error'), 'error');
+            }
+        }
+
+        async function loadAuditLogs() {
+            const res = await apiFetch('/api/admin/audit-logs?limit=100');
+            const logs = await res.json();
+            document.getElementById('log-count').textContent = logs.length;
+            document.getElementById('audit-table').innerHTML = logs.map(l => `
+                <tr>
+                    <td class="timestamp">${new Date(l.timestamp).toLocaleString()}</td>
+                    <td>${l.username}</td>
+                    <td><strong>${l.action}</strong></td>
+                    <td style="font-size: 11px;">${l.details}</td>
+                    <td class="timestamp">${l.ip_address}</td>
+                    <td><span class="badge ${l.status === 'success' ? 'bg-success' : 'bg-warning'}">${l.status}</span></td>
+                </tr>
+            `).join('');
+        }
+
+        function switchSection(section, event) {
+            event?.preventDefault();
+            const adminSections = ['users', 'mail-settings', 'audit'];
+            if (adminSections.includes(section) && window.userRole !== 'admin') {
+                showMessage('Access denied: admin only', 'error');
+                return;
+            }
+            activeSection = section;
+            document.querySelectorAll('.content-section').forEach(el => el.classList.remove('active'));
+            document.getElementById(section).classList.add('active');
+            document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
+            event?.target.closest('.nav-link')?.classList.add('active');
+
+            refreshSection(section);
+        }
+
+        function downloadCSV() {
+            window.location.href = '/api/reports/download';
+        }
+
+        function downloadJSON() {
+            window.location.href = '/api/reports/download-json';
+        }
+
+        function showCreateUserModal() {
+            new bootstrap.Modal(document.getElementById('createUserModal')).show();
+        }
+
+        async function showProfile(e) {
+            e.preventDefault();
+            const res = await apiFetch('/api/auth/profile');
+            if (!res.ok) return;
+            const profile = await res.json();
+
+            document.getElementById('profileUsername').value = profile.username || '';
+            document.getElementById('profileFullName').value = profile.full_name || '';
+            document.getElementById('profileEmail').value = profile.email || '';
+            document.getElementById('profileRole').value = profile.role || '';
+            new bootstrap.Modal(document.getElementById('profileModal')).show();
+        }
+
+        async function saveProfile() {
+            const payload = {
+                full_name: document.getElementById('profileFullName').value.trim(),
+                email: document.getElementById('profileEmail').value.trim()
+            };
+
+            if (!payload.full_name || !payload.email) {
+                showMessage('Full name and email are required', 'error');
+                return;
+            }
+
+            const res = await apiFetch('/api/auth/profile', {
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(payload)
+            });
+            if (!res.ok) {
+                const data = await res.json().catch(() => ({}));
+                showMessage('Profile update failed: ' + (data.error || 'Unknown error'), 'error');
+                return;
+            }
+            const data = await res.json();
+            document.getElementById('userName').textContent = data.profile.full_name;
+            document.getElementById('userRole').textContent = data.profile.role;
+            bootstrap.Modal.getInstance(document.getElementById('profileModal')).hide();
+            showMessage('Profile updated successfully!', 'success');
+        }
+
+        function showChangePassword(e) {
+            e.preventDefault();
+            new bootstrap.Modal(document.getElementById('changePasswordModal')).show();
+        }
+
+        async function changePassword() {
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            if (newPassword !== confirmPassword) {
+                alert('Passwords do not match!');
+                return;
+            }
+
+            const res = await apiFetch('/api/auth/change-password', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    current_password: currentPassword,
+                    new_password: newPassword,
+                    confirm_password: confirmPassword
+                })
+            });
+
+            const data = await res.json();
+            if (res.ok) {
+                alert('Password changed successfully!');
+                bootstrap.Modal.getInstance(document.getElementById('changePasswordModal')).hide();
+                document.getElementById('changePasswordForm').reset();
+            } else {
+                alert('Error: ' + data.error);
+            }
+        }
+
+        async function createUser() {
+            const username = document.getElementById('newUsername').value;
+            const email = document.getElementById('newEmail').value;
+            const fullName = document.getElementById('newFullName').value;
+            const role = document.getElementById('newRole').value;
+
+            const res = await apiFetch('/api/admin/users/create', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({username, email, full_name: fullName, role})
+            });
+
+            const data = await res.json();
+            if (res.ok) {
+                alert(`User created! Temporary password: ${data.temporary_password}`);
+                bootstrap.Modal.getInstance(document.getElementById('createUserModal')).hide();
+                document.getElementById('createUserForm').reset();
+                loadUsers();
+            } else {
+                alert('Error: ' + data.error);
+            }
+        }
+
+        function resetUserPassword(username) {
+            document.getElementById('resetPwUsername').textContent = username;
+            document.getElementById('resetPwNew').value = '';
+            document.getElementById('resetPwConfirm').value = '';
+            document.getElementById('resetPwError').style.display = 'none';
+            document.getElementById('resetPwError').textContent = '';
+            new bootstrap.Modal(document.getElementById('adminResetPasswordModal')).show();
+        }
+
+        function togglePwVisibility(inputId, btn) {
+            const input = document.getElementById(inputId);
+            const icon = btn.querySelector('i');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.replace('fa-eye', 'fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.replace('fa-eye-slash', 'fa-eye');
+            }
+        }
+
+        async function submitAdminPasswordReset() {
+            const username = document.getElementById('resetPwUsername').textContent;
+            const newPw = document.getElementById('resetPwNew').value;
+            const confirmPw = document.getElementById('resetPwConfirm').value;
+            const errEl = document.getElementById('resetPwError');
+
+            errEl.style.display = 'none';
+            errEl.textContent = '';
+
+            if (!newPw || !confirmPw) {
+                errEl.textContent = 'Both fields are required.';
+                errEl.style.display = 'block';
+                return;
+            }
+            if (newPw !== confirmPw) {
+                errEl.textContent = 'Passwords do not match.';
+                errEl.style.display = 'block';
+                return;
+            }
+
+            const res = await apiFetch(`/api/admin/users/${username}/reset-password`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({new_password: newPw})
+            });
+
+            const data = await res.json();
+            if (res.ok) {
+                bootstrap.Modal.getInstance(document.getElementById('adminResetPasswordModal')).hide();
+                showMessage(`Password reset successfully for ${username}`, 'success');
+                loadUsers();
+            } else {
+                errEl.textContent = data.error || 'Password reset failed.';
+                errEl.style.display = 'block';
+            }
+        }
+
+        async function toggleUserLock(username, currentStatus) {
+            const newStatus = currentStatus === 'active' ? 'lock' : 'unlock';
+            const endpoint = `/api/admin/users/${username}/${newStatus}`;
+
+            const res = await apiFetch(endpoint, {method: 'POST'});
+            const data = await res.json();
+            if (res.ok) {
+                alert(data.message);
+                loadUsers();
+            } else {
+                alert('Error: ' + data.error);
+            }
+        }
+
+        async function handleLogout(e) {
+            e.preventDefault();
+            await apiFetch('/api/auth/logout', {method: 'POST'});
+            window.location.href = '/login';
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadDashboard();
+            setInterval(() => {
+                if (activeSection !== 'mail-settings') {
+                    refreshSection(activeSection);
+                }
+            }, AUTO_REFRESH_MS);
+            document.getElementById('sites-search')?.addEventListener('input', applySiteFilters);
+            document.getElementById('sites-status-filter')?.addEventListener('change', applySiteFilters);
+            document.getElementById('sites-zone-filter')?.addEventListener('change', applySiteFilters);
+            document.getElementById('sites-engineer-filter')?.addEventListener('change', applySiteFilters);
+            document.getElementById('engineers-search')?.addEventListener('input', applyEngineerFilters);
+            document.getElementById('engineers-zone-filter')?.addEventListener('change', applyEngineerFilters);
+            document.getElementById('engineers-status-filter')?.addEventListener('change', applyEngineerFilters);
+            document.getElementById('reports-date-filter')?.addEventListener('change', applyReportFilters);
+            document.getElementById('reports-year-filter')?.addEventListener('change', applyReportFilters);
+            document.getElementById('reports-status-filter')?.addEventListener('change', applyReportFilters);
+        });
+    </script>
+
+</body>
+</html>
+

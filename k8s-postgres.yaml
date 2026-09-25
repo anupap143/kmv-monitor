@@ -1,0 +1,72 @@
+# PostgreSQL for KMV Network Monitor (inside the cluster, NOT the server's own PostgreSQL 16).
+# Password comes from the Secret "kmv-monitor-secrets" (created once by hand, see README).
+apiVersion: v1
+kind: Service
+metadata:
+  name: kmv-db
+  namespace: kmv-monitor
+spec:
+  selector:
+    app: kmv-db
+  ports:
+    - name: postgres
+      port: 5432
+      targetPort: 5432
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: kmv-db
+  namespace: kmv-monitor
+spec:
+  serviceName: kmv-db
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kmv-db
+  template:
+    metadata:
+      labels:
+        app: kmv-db
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:15-alpine
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_DB
+              value: kmv_network_db
+            - name: POSTGRES_USER
+              value: kmv_admin
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: kmv-monitor-secrets
+                  key: POSTGRES_PASSWORD
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+          readinessProbe:
+            exec:
+              command: ["sh", "-c", "pg_isready -U kmv_admin -d kmv_network_db"]
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          livenessProbe:
+            exec:
+              command: ["sh", "-c", "pg_isready -U kmv_admin -d kmv_network_db"]
+            initialDelaySeconds: 30
+            periodSeconds: 15
+          resources:
+            requests: { cpu: 50m, memory: 128Mi }
+            limits:   { cpu: 500m, memory: 384Mi }
+          volumeMounts:
+            - name: pgdata
+              mountPath: /var/lib/postgresql/data
+  volumeClaimTemplates:
+    - metadata:
+        name: pgdata
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 2Gi
